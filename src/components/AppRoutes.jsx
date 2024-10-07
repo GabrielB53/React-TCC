@@ -19,9 +19,11 @@ import AlterarCardapio from "../templates/Cardapio/AlterarCardapio"
 import DeletarCardapio from "../templates/Cardapio/DeletarCardapio"
 import Cardapio from "../templates/Cardapio/Cardapio"
 import UsuarioDeletar from "../templates/Usuario/UsuarioDeletar"
+import { ThemeProvider } from "../contexts/ThemeContext"
 
 const AppRoutes = () => {
   return (
+    <ThemeProvider>
     <div>
       <Routes>
         <Route path="/" element={<App />} />
@@ -45,7 +47,9 @@ const AppRoutes = () => {
         <Route path="/deletarcardapio" element={<DeletarCardapio />} />
         <Route path="/cardapio" element={<Cardapio />} />
       </Routes>
+     
     </div>
+    </ThemeProvider>
   )
 }
 export default AppRoutes

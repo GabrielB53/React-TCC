@@ -52,10 +52,6 @@ const Login = () => {
         },
     });
 
-    const backto = () => {
-        navigate("/");
-    }
-
     return (
         <div className="">
           <Container component="main" maxWidth="xs">
