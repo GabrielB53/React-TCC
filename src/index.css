@@ -36,6 +36,7 @@ body {
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   height: 100%;
+  width: 100%;
   color: var(--text-color);
   transition: background 0.3s, color 0.3s;
 }
@@ -44,7 +45,7 @@ body {
 .dark-theme {
   --text-color: white;
   --data-bs-theme: "dark";
-  background: linear-gradient(-45deg, #2b2b2b, #1f1f1f, #121212, #2b2b2b);
+  background: linear-gradient(-45deg, #812727, #000000, #121212, #3f0606);
   background-size: 400% 400%;
   animation: gradient-dark 15s ease infinite;
   color: var(--text-color);

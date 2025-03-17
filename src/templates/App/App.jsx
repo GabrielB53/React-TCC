@@ -23,7 +23,7 @@ function App() {
     const buttonColor = theme === 'Claro' ? 'primary' : 'error';
 
     return (
-        <div className={`opa ${theme === 'Escuro' ? 'dark-theme' : ''}`}> {/* Adicionar classe de tema */}
+        <div className={`opa ${theme === 'Escuro' ? 'dark-theme' : ''}`}>
             <nav>
                 <Navbar />
             </nav>
