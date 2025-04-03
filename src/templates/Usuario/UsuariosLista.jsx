@@ -11,7 +11,7 @@ const UsuariosLista = () => {
     const navigate = useNavigate();
 
     function receberDados(){
-        axios.get('http://localhost:8080/usuarionovo'
+        axios.get('http://localhost:8080/usuario'
         ).then(response => {
             console.log(response.data)
             setDados(response.data)

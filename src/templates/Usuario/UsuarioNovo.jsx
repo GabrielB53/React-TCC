@@ -21,7 +21,7 @@ const UsuarioNovo = () => {
     });
 
     const enviarDados = () => {
-        axios.post('http://localhost:8080/usuarionovo', dados)
+        axios.post('http://localhost:8080/usuario', dados)
             .then(response => {
                 console.log(response);
                 setAlerta({ show: true, message: 'Dados enviados com sucesso!', type: 'success' });

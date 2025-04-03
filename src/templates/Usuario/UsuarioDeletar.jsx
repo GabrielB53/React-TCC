@@ -11,7 +11,7 @@ const UsuariosLista = () => {
     const [itemApagado, setItemApagado] = useState(false)
 
     function receberDados(){
-        axios.get('http://localhost:8080/usuarionovo'
+        axios.get('http://localhost:8080/usuario'
         ).then(response => {
             console.log(response.data)
             setDados(response.data)
@@ -20,7 +20,7 @@ const UsuariosLista = () => {
     }
 
     async function apagarDados(usuario){
-        axios.delete('http://localhost:8080/usuarionovo',
+        axios.delete('http://localhost:8080/usuario',
         {
             data : usuario,
             headers: {                  
