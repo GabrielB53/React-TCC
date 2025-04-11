@@ -37,7 +37,7 @@ const CardapioLista = () => {
                 <td>
                     <button
                         className="btn btn-danger"
-                        onClick={() => navigate('/cardapioeditar', { state: { cardapio } })}
+                        onClick={() => navigate('/alterarcardapio', { state: { cardapio } })}
                     >
                         Alterar
                     </button>

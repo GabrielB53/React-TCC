@@ -18,7 +18,7 @@ const AlterarCardapio = () => {
 
     const validationSchema = Yup.object().shape({
         nome: Yup.string().required('Nome é obrigatório'),
-        dataCardapio: Yup.string().required('Data é obrisgatória'),
+        dataCardapio: Yup.string().required('Data é obrigatória'),
         principal: Yup.string().required('É necessário preencher!'),
         acompanhamento: Yup.string().required('É necessário preencher!'),
         adicional: Yup.string().required('É necessário preencher!')
@@ -29,7 +29,7 @@ const AlterarCardapio = () => {
             .then(response => {
                 setAlerta({ show: true, message: 'Cardápio atualizado com sucesso!', type: 'success' });
                 setTimeout(() => {
-                    navigate('/cardapioslista');
+                    navigate('/cardapio-lista');
                 }, 2000);
             })
             .catch(error => {
@@ -71,7 +71,7 @@ const AlterarCardapio = () => {
                             <form onSubmit={props.handleSubmit} className="row g-3">
                                 <div className="col-md-2">
                                     <label htmlFor="inputID" className="form-label">ID</label>
-                                    <input type="text" className="form-control" id="inputID" readOnly 
+                                    <input type="text" className="form-control" id="inputID" readOnly
                                         value={cardapio.id} />
                                 </div>
                                 <div className="col-md-5">
@@ -90,56 +90,65 @@ const AlterarCardapio = () => {
                                     )}
                                 </div>
                                 <div className="col-md-5">
-                                    <label htmlFor="inputEmail4" className="form-label">Email</label>
+                                    <label htmlFor="inputData" className="form-label">Data</label>
                                     <input
-                                        type="email"
+                                        type="date"
                                         className="form-control"
-                                        id="inputEmail4"
-                                        name="email"
+                                        id="inputData"
+                                        name="data"
                                         onChange={props.handleChange}
                                         onBlur={props.handleBlur}
-                                        value={props.values.email}
+                                        value={props.values.dataCardapio}
                                     />
-                                    {props.touched.email && props.errors.email && (
-                                        <div id="feedback">{props.errors.email}</div>
+                                    {props.touched.dataCardapio && props.errors.dataCardapio && (
+                                        <div id="feedback">{props.errors.dataCardapio}</div>
                                     )}
                                 </div>
-
                                 <div className="col-md-5">
-                                    <label htmlFor="inputSenha" className="form-label">Senha (Deixe em branco para não alterar)</label>
+                                    <label htmlFor="inputPrincipal" className="form-label">Principal</label>
                                     <input
-                                        type="password"
+                                        type="text"
                                         className="form-control"
-                                        id="inputSenha"
-                                        name="senha"
+                                        id="inputPrincipal"
+                                        name="principal"
                                         onChange={props.handleChange}
                                         onBlur={props.handleBlur}
-                                        value={props.values.senha}
+                                        value={props.values.principal}
                                     />
-                                    {props.touched.senha && props.errors.senha && (
-                                        <div id="feedback">{props.errors.senha}</div>
+                                    {props.touched.principal && props.errors.principal && (
+                                        <div id="feedback">{props.errors.principal}</div>
                                     )}
                                 </div>
-
-                                <div className="col-md-4">
-                                    <label htmlFor="inputAcesso" className="form-label">Acesso</label>
-                                    <select
-                                        id="inputAcesso"
-                                        className="form-select"
-                                        name="tipoUsuario"
+                                <div className="col-md-5">
+                                    <label htmlFor="inputAcompanhamento" className="form-label">Acompanhamento</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="inputAcompanhamento"
+                                        name="acompanhamento"
                                         onChange={props.handleChange}
                                         onBlur={props.handleBlur}
-                                        value={props.values.tipoUsuario}
-                                    >
-                                        <option value="">Selecione o tipo</option>
-                                        <option value="Aluno">Aluno</option>
-                                        <option value="Funcionario">Funcionário</option>
-                                    </select>
-                                    {props.touched.tipoUsuario && props.errors.tipoUsuario && (
-                                        <div id="feedback">{props.errors.tipoUsuario}</div>
+                                        value={props.values.acompanhamento}
+                                    />
+                                    {props.acompanhamento && props.errors.acompanhamento && (
+                                        <div id="feedback">{props.errors.acompanhamento}</div>
                                     )}
                                 </div>
-
+                                <div className="col-md-5">
+                                    <label htmlFor="inputAdicional" className="form-label">Adicional</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="inputAdicional"
+                                        name="adicional"
+                                        onChange={props.handleChange}
+                                        onBlur={props.handleBlur}
+                                        value={props.values.adicional}
+                                    />
+                                    {props.adicional && props.errors.adicional && (
+                                        <div id="feedback">{props.errors.adicional}</div>
+                                    )}
+                                </div>
                                 <div className="col-12 d-flex justify-content-between">
                                     <button type="submit" className="btn btn-primary">
                                         Gravar Alterações
