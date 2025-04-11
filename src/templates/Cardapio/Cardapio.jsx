@@ -13,7 +13,7 @@ const Cardapio = () => {
         navigate('/addcardapio');  
     };
     const alterarCardapio = () => {
-        navigate('/alterarcardapio');  
+        navigate('/cardapio-lista');  
     };
     const deletarCardapio = () =>{
         navigate('/deletarcardapio')
@@ -32,7 +32,7 @@ const Cardapio = () => {
                     <div className="d-flex justify-content-around">
                     <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
                     <Button onClick={novoCardapio}>Adicionar</Button>
-                    <Button onClick={alterarCardapio}>Alterar</Button>
+                    <Button onClick={alterarCardapio}>Lista</Button>
                     <Button onClick={deletarCardapio}>Deletar</Button>
                     </ButtonGroup>
                     </div>

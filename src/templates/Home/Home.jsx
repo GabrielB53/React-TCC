@@ -4,6 +4,7 @@ import logo from '../../assets/images/home.png'
 import Caarousel from '../../components/Carousel/Nsei'
 import ContentHome from "../../components/Secoes/ContentHome"
 import './Home.css'
+import '../../components/Carousel/Style.css'
 
 const Home = () => {
     const OPTIONS = {}

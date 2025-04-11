@@ -1,20 +1,15 @@
 import React, { useContext } from 'react';
 import './App.css';
-import '../../components/Carousel/Style.css';
 import Navbar from '../../components/Navbar/Navegacao';
-import Caarousel from '../../components/Carousel/Nsei';
 import SectionContent from '../../components/Secoes/SectionContent';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { ThemeContext } from '../../contexts/ThemeContext'; // Importar o contexto
+import CustomCarousel from '../../components/Carousel/Carousel';
 
 function App() {
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext); // Usar o contexto para obter o tema
-
-    const OPTIONS = {};
-    const SLIDE_COUNT = 5;
-    const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
 
     const login = () => {
         navigate("/login");
@@ -30,7 +25,7 @@ function App() {
             <div className="container mb-5 ">
                 <h1 className="text-center fw-bold m-4">Bem-vindo ao SGM!</h1>
                 <section className="uepa">
-                    <Caarousel slides={SLIDES} options={OPTIONS} />
+                   <CustomCarousel/>
                 </section>
             </div>
             <main className="container">

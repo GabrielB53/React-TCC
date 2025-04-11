@@ -20,6 +20,7 @@ import DeletarCardapio from "../templates/Cardapio/DeletarCardapio"
 import Cardapio from "../templates/Cardapio/Cardapio"
 import UsuarioDeletar from "../templates/Usuario/UsuarioDeletar"
 import { ThemeProvider } from "../contexts/ThemeContext"
+import CardapioLista from "../templates/Cardapio/CardapioLista"
 
 const AppRoutes = () => {
   return (
@@ -46,6 +47,7 @@ const AppRoutes = () => {
         <Route path="/alterarcardapio" element={<AlterarCardapio />} />
         <Route path="/deletarcardapio" element={<DeletarCardapio />} />
         <Route path="/cardapio" element={<Cardapio />} />
+        <Route path="/cardapio-lista" element={<CardapioLista/>}/>
       </Routes>
      
     </div>
