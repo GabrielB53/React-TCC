@@ -1,63 +1,78 @@
-import { Link, useNavigate } from "react-router-dom"
-import Header from "../../components/Header/Header"
-import Sidebar from '../../components/Menu/Sidebar'
-import logo from '../../assets/images/home.png'
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Sidebar from '../../components/Menu/Sidebar';
+import logo from '../../assets/images/home.png';
+import axios from 'axios';
+import { useEffect, useState } from "react";
 
 const Mensagem = () => {
-
+    
+    const [dados, setDados] = useState([])
     const navigate = useNavigate();
 
-    const goTo = () => {
-        navigate('/mensagemler')
+    function receberDados(){
+        axios.get('http://localhost:8080/mensagem'
+        ).then(response => {
+            console.log(response.data)
+            setDados(response.data)
+        })
+        .catch(error => console.log(error))
     }
+    useEffect(()=>{
+        receberDados()
+    }, [])
 
-    const getId = (id) => {
-        console.log("ID:", id);
-    }
+
+
+
+    const ItensTable = () => dados.map(
+        mensagem => (
+            <tr key={mensagem.id}>
+                <td>{mensagem.id}</td>
+                <td>{mensagem.dataMensagem}</td>
+                <td>{mensagem.nome}</td>
+                <td>{mensagem.emissor}</td>
+                <td>
+                    <button
+                        className="btn btn-danger"
+                        onClick={() => navigate('/alterarmensagem', { state: { mensagem } })}
+                    >
+                        Alterar
+                    </button>
+                </td>
+            </tr>
+        )
+    );
+
     return (
         <div className="d-flex">
             <Sidebar />
             <div className="p-3 w-100">
                 <Header
-                    goto={'/home'}
-                    title={'Mensagem'}
+                    goto={'/mensagem'}
+                    title={'Lista de Cardápios'}
                     logo={logo}
                 />
-                <section className="p-2 m-2 shadow-lg">
-                    <div className="table-wrapper container">
+                <section className="m-2 p-2 shadow-lg">
+                    <div className="table-wrapper">
                         <table className="table table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">ID</th>
+                                    <th scope="col">Nome</th>
                                     <th scope="col">Data</th>
                                     <th scope="col">Emissor</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Abrir</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td scope="row">1</td>
-                                    <td>Mark</td>
-                                    <td>Otto</td>
-                                    <td>@mdo</td>
-                                    <td>@mdo</td>
-                                    <td>
-                                        <button type="button" onClick={() => goTo()}
-                                                className="btn btn-sm btn-warning">
-                                            <i className="bi bi-envelope-open me-2"></i>Abrir
-                                        </button>
-                                    </td>
-
-                                </tr>
+                                <ItensTable />
                             </tbody>
                         </table>
                     </div>
                 </section>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Mensagem
+export default Mensagem;
