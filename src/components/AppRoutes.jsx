@@ -21,6 +21,7 @@ import Cardapio from "../templates/Cardapio/Cardapio"
 import UsuarioDeletar from "../templates/Usuario/UsuarioDeletar"
 import { ThemeProvider } from "../contexts/ThemeContext"
 import CardapioLista from "../templates/Cardapio/CardapioLista"
+import MensagemLista from "../templates/Mensagem/MensagemLista"
 
 const AppRoutes = () => {
   return (
@@ -34,6 +35,7 @@ const AppRoutes = () => {
 
         <Route path="/mensagem" element={<Mensagem />} />
         <Route path="/mensagemler" element={<MensagemLer />} />
+        <Route path="/mensagemlista" element={<MensagemLista/>} />
 
 
         <Route path="/usuario" element={<Usuario />} />
@@ -43,6 +45,7 @@ const AppRoutes = () => {
         <Route path="/usuariodeletar" element={<UsuarioDeletar />} />
         
         <Route path="/grafico" element={<Grafico />} />
+        
         <Route path="/addcardapio" element={<AddCardapio />} />
         <Route path="/alterarcardapio" element={<AlterarCardapio />} />
         <Route path="/deletarcardapio" element={<DeletarCardapio />} />

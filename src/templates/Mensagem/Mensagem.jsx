@@ -1,78 +1,42 @@
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
-import Sidebar from '../../components/Menu/Sidebar';
-import logo from '../../assets/images/home.png';
-import axios from 'axios';
-import { useEffect, useState } from "react";
+import {useNavigate } from "react-router-dom"
+import Header from "../../components/Header/Header"
+import Sidebar from '../../components/Menu/Sidebar'
+import logo from '../../assets/images/home.png'
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 
 const Mensagem = () => {
-    
-    const [dados, setDados] = useState([])
     const navigate = useNavigate();
 
-    function receberDados(){
-        axios.get('http://localhost:8080/mensagem'
-        ).then(response => {
-            console.log(response.data)
-            setDados(response.data)
-        })
-        .catch(error => console.log(error))
-    }
-    useEffect(()=>{
-        receberDados()
-    }, [])
-
-
-
-
-    const ItensTable = () => dados.map(
-        mensagem => (
-            <tr key={mensagem.id}>
-                <td>{mensagem.id}</td>
-                <td>{mensagem.dataMensagem}</td>
-                <td>{mensagem.nome}</td>
-                <td>{mensagem.emissor}</td>
-                <td>
-                    <button
-                        className="btn btn-danger"
-                        onClick={() => navigate('/alterarmensagem', { state: { mensagem } })}
-                    >
-                        Alterar
-                    </button>
-                </td>
-            </tr>
-        )
-    );
-
+    const novoUser = () => {
+        navigate('/mensagemnovo');  
+    };
+    const listaUser = () => {
+        navigate('/mensagemlista');  
+    };
+    const deletarUser = () => {
+        navigate('/mensagemdeletar');  
+    };
     return (
         <div className="d-flex">
-            <Sidebar />
-            <div className="p-3 w-100">
-                <Header
-                    goto={'/mensagem'}
-                    title={'Lista de Cardápios'}
+           <Sidebar />
+           <div className="p-3 w-100">
+           <Header 
+                    goto={'/home'}
+                    title={'Mensagens'}
                     logo={logo}
-                />
-                <section className="m-2 p-2 shadow-lg">
-                    <div className="table-wrapper">
-                        <table className="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Data</th>
-                                    <th scope="col">Emissor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <ItensTable />
-                            </tbody>
-                        </table>
+                    />
+               <section className="mt-2 p-2 shadow-lg caixota">
+                    <div className="d-flex justify-content-around">
+                    <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                    <Button onClick={novoUser}>Nova Mensagem</Button>
+                    <Button onClick={listaUser}>Lista de Mensagens</Button>
+                    </ButtonGroup>
                     </div>
                 </section>
-            </div>
+           </div>
         </div>
-    );
-};
+    )
+}
 
-export default Mensagem;
+export default Mensagem
