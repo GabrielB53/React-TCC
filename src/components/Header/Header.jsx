@@ -12,13 +12,7 @@ const Header = ({ goto, title, logo }) => {
     const vaipara = () => {
         navigate(goto); 
     };
-    const [theme, setTheme] = useState('Claro'); 
-
-    useEffect(() => {
-      const savedTheme = localStorage.getItem('tema') || 'Claro';
-      setTheme(savedTheme); 
-    }, []);
-  
+    const [theme, setTheme] = useState(() => localStorage.getItem('tema') || 'Claro');
 
     const buttonColor = theme === 'Claro' ? 'primary' : 'error';
     const homeBgColor = theme === 'Claro' ? 'primary.main' : 'error.main';

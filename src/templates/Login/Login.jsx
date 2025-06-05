@@ -1,164 +1,151 @@
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Box from '@mui/material/Box';
-import './Login.css';
-import React, { useState, useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import Avatar from '@mui/material/Avatar';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { useFormik } from 'formik';
-import Avatar from '@mui/material/Avatar';
-import * as yup from 'yup';
-import axios from 'axios'; 
-
-const validationSchema = yup.object({
-    email: yup
-      .string('Digite seu email')
-      .matches(
-        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
-        'Digite um email válido'
-      )
-      .required('Email necessário'),
-    password: yup
-      .string('Digite sua senha')
-      .min(8, 'A senha deve ter um tamanho mínimo de 8 letras')
-      .required('Senha necessária'),
-});
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import UsuarioService from "../../services/UsuarioService";
+import './Login.css';
 
 const Login = () => {
-    const navigate = useNavigate();
-    const [theme, setTheme] = useState('Claro'); 
-    const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
+  const [theme, setTheme] = useState('Claro');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
 
-    useEffect(() => {
-      const savedTheme = localStorage.getItem('tema') || 'Claro';
-      setTheme(savedTheme); 
-    }, []);
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('tema') || 'Claro';
+    setTheme(savedTheme);
+  }, []);
 
-    const buttonColor = theme === 'Claro' ? 'primary' : 'error';
-    const avatarBgColor = theme === 'Claro' ? 'primary.main' : 'error.main';
-    const textColor = theme === 'Claro' ? '' : 'white';
+  const buttonColor = theme === 'Claro' ? 'primary' : 'error';
+  const avatarBgColor = theme === 'Claro' ? 'primary.main' : 'error.main';
+  const textColor = theme === 'Claro' ? '' : 'white';
 
-    const formik = useFormik({
-        initialValues: {
-            email: 'sa@gmail.com',
-            password: '12345678',
-        },
-        validationSchema: validationSchema,
-        onSubmit: (values) => {
-            axios.post('http://localhost:8080/usuario/login', null, {
-                params: {
-                    email: values.email,
-                    password: values.password
-                }
-            })
-            .then((response) => {
-                if (response.status === 200) {
-                    navigate("/home");
-                }
-            })
-            .catch((error) => {
-                if (error.response && error.response.status === 401) {
-                    setErrorMessage('Credenciais inválidas. Verifique seu email e senha.');
-                } else {
-                    setErrorMessage('Erro no servidor. Tente novamente mais tarde.');
-                }
-            });
-        },
-    });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(fd => ({ ...fd, [name]: value }));
+  };
 
-    return (
-        <div className="">
-          <Container component="main" maxWidth="xs">
-            <Box className="caixota" sx={{ marginTop: 8 }}>
-            <form onSubmit={formik.handleSubmit} >
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setSubmitting(true);
+
+    UsuarioService.signin(formData.email, formData.password).then(
+      () => {
+        const userJson = localStorage.getItem("user");
+        const user = JSON.parse(userJson || '{}');
+
+        if (user.statusUsuario === 'ATIVO') {
+          navigate("/home");
+        } else if (user.statusUsuario === 'TROCAR_SENHA') {
+          navigate(`/newpass/${user.id}`);
+        } else {
+          setErrorMessage("Usuário com status inválido.");
+        }
+        setSubmitting(false);
+      },
+      (error) => {
+        const respMessage =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+        setErrorMessage(respMessage);
+        setSubmitting(false);
+      }
+    );
+  };
+
+  return (
+    <Container component="main" maxWidth="xs">
+      <Box className="caixota" sx={{ marginTop: 8 }}>
+        <form onSubmit={handleSubmit} noValidate>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Avatar sx={{ m: 1, bgcolor: avatarBgColor }}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <Typography component="h1" variant="h5" sx={{ color: textColor }}>
-                Login
-              </Typography>
-              </Box>
-                <div className="mb-2">
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  name="email"
-                  label="Email"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
-                  InputProps={{style: { color: textColor },}}
-                  InputLabelProps={{style: { color: textColor }}}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {borderColor: textColor,},
-                      '&:hover fieldset': {borderColor: textColor,},
-                      '&.Mui-focused fieldset': {borderColor: textColor,},
-                    },
-                  }}
-                />
-                </div>
-                <div>
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="password"
-                  name="password"
-                  label="Senha"
-                  type="password"
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={formik.touched.password && Boolean(formik.errors.password)}
-                  helperText={formik.touched.password && formik.errors.password}
-                  InputProps={{style: { color: textColor },}}
-                  InputLabelProps={{style: { color: textColor }}}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {borderColor: textColor,},
-                      '&:hover fieldset': {borderColor: textColor,},
-                      '&.Mui-focused fieldset': {borderColor: textColor,},
-                    },
-                  }}
-                />
-                </div>
-                {errorMessage && (
-                  <Typography color="error" variant="body2">
-                      {errorMessage}
-                  </Typography>
-              )}
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 2, mb: 2 }}
-                color={buttonColor}
-              >
-                Entrar
-              </Button>
-            
-              <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                  <Link to="/forgotpass" variant="body2" className="link-color">
-                  Esqueceu a senha?
-                  </Link>
-                  <Link to="/" variant="body2" className="link-color">
-                  Voltar
-                  </Link>
-              </Box>
-          </form>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography component="h1" variant="h5" sx={{ color: textColor }}>
+              Login
+            </Typography>
           </Box>
-      </Container>
-      </div>
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            name="email"
+            label="Email"
+            value={formData.email}
+            onChange={handleChange}
+            InputProps={{ style: { color: textColor } }}
+            InputLabelProps={{ style: { color: textColor } }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: textColor },
+                '&:hover fieldset': { borderColor: textColor },
+                '&.Mui-focused fieldset': { borderColor: textColor },
+              },
+            }}
+          />
+
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="password"
+            name="password"
+            label="Senha"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            InputProps={{ style: { color: textColor } }}
+            InputLabelProps={{ style: { color: textColor } }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: textColor },
+                '&:hover fieldset': { borderColor: textColor },
+                '&.Mui-focused fieldset': { borderColor: textColor },
+              },
+            }}
+          />
+
+          {errorMessage && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {errorMessage}
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            color={buttonColor}
+            disabled={submitting}
+          >
+            Entrar
+          </Button>
+
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Link to="/forgotpass" className="link-color" style={{ textDecoration: 'none' }}>
+              Esqueceu a senha?
+            </Link>
+            <Link to="/" className="link-color" style={{ textDecoration: 'none' }}>
+              Voltar
+            </Link>
+          </Box>
+        </form>
+      </Box>
+    </Container>
   );
-}
+};
 
 export default Login;

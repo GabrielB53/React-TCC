@@ -22,6 +22,11 @@ import UsuarioDeletar from "../templates/Usuario/UsuarioDeletar"
 import { ThemeProvider } from "../contexts/ThemeContext"
 import CardapioLista from "../templates/Cardapio/CardapioLista"
 import MensagemLista from "../templates/Mensagem/MensagemLista"
+import LoginNewPass from "../templates/Login/LoginNewPass"
+import UsuarioPerfil from "../templates/Usuario/UsuarioPerfil"
+import UsuarioAlterarSenha from "../templates/Usuario/UsuarioAlterarSenha"
+import RotaProtegida from "./Acesso/RotaProtegida"
+
 
 const AppRoutes = () => {
   return (
@@ -29,8 +34,11 @@ const AppRoutes = () => {
     <div>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/home" element={<RotaProtegida><Home /></RotaProtegida>}/>
+
         <Route path="/login" element={<Login />} />
+        <Route path="/novasenha" element={<LoginNewPass/>}></Route>
+
         <Route path="/forgotpass" element={<ForgotPass />} />
 
         <Route path="/mensagem" element={<Mensagem />} />
@@ -39,6 +47,8 @@ const AppRoutes = () => {
 
 
         <Route path="/usuario" element={<Usuario />} />
+        <Route path="/usuarioperfil/:id" element={<UsuarioPerfil />} />
+        <Route path="/usuarioalterarsenha/:id" element={<UsuarioAlterarSenha />} />
         <Route path="/usuarioslista" element={<UsuariosLista />} />
         <Route path="/usuarionovo" element={<UsuarioNovo />} />
         <Route path="/usuarioeditar" element={<UsuarioEditar />} />
