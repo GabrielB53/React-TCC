@@ -1,40 +1,85 @@
-import {useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Header from "../../components/Header/Header"
 import Sidebar from '../../components/Menu/Sidebar'
 import logo from '../../assets/images/home.png'
-import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
+import { useEffect, useState } from "react"
+import MensagemService from "../../services/MensagemService"
 
 const Mensagem = () => {
     const navigate = useNavigate();
+    const [mensagens, setMensagens] = useState([]);
 
-    const novoUser = () => {
-        navigate('/mensagemnovo');  
-    };
-    const listaUser = () => {
-        navigate('/mensagemlista');  
-    };
-    const deletarUser = () => {
-        navigate('/mensagemdeletar');  
-    };
+    useEffect(() => {
+        MensagemService.findAll().then(
+            (response) => {
+                const mensagens = response.data;
+                setMensagens(mensagens);
+            }
+        ).catch((error) => {
+            console.log(error);
+        })
+    }, []);
+
+    const lerMensagem = (id) => {
+        navigate(`/mensagemler/` + id)
+    }
+
     return (
         <div className="d-flex">
-           <Sidebar />
-           <div className="p-3 w-100">
-           <Header 
+            <Sidebar />
+            <div className="p-3 w-100">
+                <Header
                     goto={'/home'}
-                    title={'Mensagens'}
+                    title={'Mensagem'}
                     logo={logo}
-                    />
-               <section className="mt-2 p-2 shadow-lg caixota">
-                    <div className="d-flex justify-content-around">
-                    <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                    <Button onClick={novoUser}>Nova Mensagem</Button>
-                    <Button onClick={listaUser}>Lista de Mensagens</Button>
-                    </ButtonGroup>
+                />
+                <section className="p-2 m-2 shadow-lg">
+                    <div className="m-2">
+                        <div className="btn btn-info position-relative fw-bold">
+                            Total de Mensagens
+                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {mensagens.length}
+                                <span className="visually-hidden">total de mensagens</span>
+                            </span>
+                        </div>
+                        <Link className="btn btn-success ms-3 shadow-lg" to={'/mensagemlista'}>
+                            Lista
+                        </Link>
+                    </div>
+                    <div className="table-wrapper">
+                        <table className="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Data</th>
+                                    <th scope="col">Emissor</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Abrir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {mensagens?.map((mensagem) => (
+                                    <tr key={mensagem.id}>
+                                        <td scope="row">{mensagem.id}</td>
+                                        <td>{mensagem.dataMensagem}</td>
+                                        <td>{mensagem.emissorMensagem}</td>
+                                        <td>{mensagem.email}</td>
+                                        <td>{mensagem.statusMensagem}</td>
+                                        <td>
+                                            <button type="button" onClick={() => lerMensagem(mensagem.id)}
+                                                className="btn btn-sm btn-warning">
+                                                <i className="bi bi-envelope-open me-2"></i>Abrir
+                                            </button>
+                                        </td>
+
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </section>
-           </div>
+            </div>
         </div>
     )
 }

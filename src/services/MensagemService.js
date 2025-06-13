@@ -10,7 +10,7 @@ const findById = (id) => {
 };
 
 const findByEmail = (email) => {
-    return http.mainInstance.get(API_URL + `findByEmail`, { email });
+    return http.mainInstance.get(API_URL + `findByEmail/${encodeURIComponent(email)}`);
 };
 
 const create = data => {
