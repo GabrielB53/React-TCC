@@ -4,17 +4,17 @@ import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
 import { useEffect, useState } from "react";
 import MensagemService from "../../services/MensagemService";
-import { Button, Badge, Typography, Box } from '@mui/material'; // Importando componentes do MUI
+import { Button, Badge, Box } from '@mui/material';
 
 const Mensagem = () => {
     const navigate = useNavigate();
     const [mensagens, setMensagens] = useState([]);
+    const [mostrarInativas, setMostrarInativas] = useState(false); // 👈 novo estado
 
     useEffect(() => {
         MensagemService.findAll().then(
             (response) => {
-                const mensagens = response.data;
-                setMensagens(mensagens);
+                setMensagens(response.data);
             }
         ).catch((error) => {
             console.log(error);
@@ -22,7 +22,7 @@ const Mensagem = () => {
     }, []);
 
     const lerMensagem = (id) => {
-        navigate(`/mensagemler/` + id);
+        navigate(`/mensagemler/${id}`);
     };
 
     return (
@@ -34,8 +34,9 @@ const Mensagem = () => {
                     title={'Mensagem'}
                     logo={logo}
                 />
+
                 <section className="p-2 m-2 shadow-lg">
-                    <Box m={2}>
+                    <Box m={2} display="flex" alignItems="center">
                         <Button variant="contained" color="info" sx={{ position: 'relative' }}>
                             Total de Mensagens
                             <Badge
@@ -49,12 +50,24 @@ const Mensagem = () => {
                                 }}
                             />
                         </Button>
+
                         <Link to={'/mensagemlista'} style={{ textDecoration: 'none' }}>
                             <Button variant="contained" color="success" sx={{ ml: 2 }}>
                                 Lista
                             </Button>
                         </Link>
+
+                        {/* 👇 Botão para alternar exibição de inativas */}
+                        <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={() => setMostrarInativas(!mostrarInativas)}
+                            sx={{ ml: 2 }}
+                        >
+                            {mostrarInativas ? 'Ocultar Inativas' : 'Mostrar Inativas'}
+                        </Button>
                     </Box>
+
                     <div className="table-wrapper">
                         <table className="table table-striped table-hover">
                             <thead>
@@ -68,31 +81,31 @@ const Mensagem = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {mensagens?.map((mensagem) => {
-                                    // Formatar a data para dd/mm/yyyy
-                                    const dataFormatada = new Date(mensagem.dataMensagem).toLocaleDateString('pt-BR');
-
-                                    return (
-                                        <tr key={mensagem.id}>
-                                            <td scope="row">{mensagem.id}</td>
-                                            <td>{dataFormatada}</td>
-                                            <td>{mensagem.emissorMensagem}</td>
-                                            <td>{mensagem.email}</td>
-                                            <td>{mensagem.statusMensagem}</td>
-                                            <td>
-                                                <Button
-                                                    variant="contained"
-                                                    color="warning"
-                                                    onClick={() => lerMensagem(mensagem.id)}
-                                                    size="small"
-                                                    sx={{ display: 'flex', alignItems: 'center' }}
-                                                >
-                                                    <i className="bi bi-envelope-open me-2"></i>Abrir
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
+                                {mensagens
+                                    .filter(m => mostrarInativas || m.statusMensagem !== 'INATIVO')
+                                    .map((mensagem) => {
+                                        const dataFormatada = new Date(mensagem.dataMensagem).toLocaleDateString('pt-BR');
+                                        return (
+                                            <tr key={mensagem.id}>
+                                                <td scope="row">{mensagem.id}</td>
+                                                <td>{dataFormatada}</td>
+                                                <td>{mensagem.emissor}</td>
+                                                <td>{mensagem.email}</td>
+                                                <td>{mensagem.statusMensagem}</td>
+                                                <td>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="warning"
+                                                        onClick={() => lerMensagem(mensagem.id)}
+                                                        size="small"
+                                                        sx={{ display: 'flex', alignItems: 'center' }}
+                                                    >
+                                                        <i className="bi bi-envelope-open me-2"></i>Abrir
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                             </tbody>
                         </table>
                     </div>

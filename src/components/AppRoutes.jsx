@@ -37,12 +37,12 @@ const AppRoutes = () => {
         <Route path="/home" element={<RotaProtegida><Home /></RotaProtegida>}/>
 
         <Route path="/login" element={<Login />} />
-        <Route path="/novasenha" element={<LoginNewPass/>}></Route>
+        <Route path="/newpass/:id" element={<LoginNewPass/>}></Route>
 
         <Route path="/forgotpass" element={<ForgotPass />} />
 
         <Route path="/mensagem" element={<RotaProtegida><Mensagem /></RotaProtegida>} />
-        <Route path="/mensagemler" element={<RotaProtegida><MensagemLer /></RotaProtegida>} />
+        <Route path="/mensagemler/:id" element={<RotaProtegida><MensagemLer /></RotaProtegida>} />
         <Route path="/mensagemlista" element={<RotaProtegida><MensagemLista/></RotaProtegida>} />
 
 

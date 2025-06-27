@@ -8,10 +8,13 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import UsuarioService from "../../services/UsuarioService";
+import { useUser } from '../../contexts/UserContext';  // importe o contexto do usuário
 import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { setCurrentUser } = useUser(); // pega a função para atualizar o contexto
+
   const [theme, setTheme] = useState('Claro');
   const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -38,8 +41,17 @@ const Login = () => {
 
     UsuarioService.signin(formData.email, formData.password).then(
       () => {
+        // Lê o usuário do localStorage (login antigo salva lá)
         const userJson = localStorage.getItem("user");
-        const user = JSON.parse(userJson || '{}');
+        const user = JSON.parse(userJson || null);
+
+        if (!user) {
+          setErrorMessage("Usuário ou senha inválidos");
+          setSubmitting(false);
+          return;
+        }
+
+        setCurrentUser(user); // Atualiza o contexto com o usuário
 
         if (user.statusUsuario === 'ATIVO') {
           navigate("/home");
@@ -48,6 +60,7 @@ const Login = () => {
         } else {
           setErrorMessage("Usuário com status inválido.");
         }
+
         setSubmitting(false);
       },
       (error) => {

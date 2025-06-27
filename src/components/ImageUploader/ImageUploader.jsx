@@ -4,13 +4,11 @@ import './ImageUploader.css';
 
 const ImageUploader = ({ setFile }) => {
     const [currentFile, setCurrentFile] = useState(undefined);
-    const [previewImage, setPreviewImage] = useState(undefined);
 
     const selectFile = (event) => {
         const selectedFile = event.target.files[0];
         const previewImage = URL.createObjectURL(selectedFile);
         setCurrentFile(selectedFile);
-        setPreviewImage(previewImage);
     };
 
     useEffect(() => {
@@ -19,7 +17,6 @@ const ImageUploader = ({ setFile }) => {
 
     const deleteFile = () => {
         setCurrentFile(undefined);
-        setPreviewImage(undefined);
     };
 
     return (
@@ -52,17 +49,6 @@ const ImageUploader = ({ setFile }) => {
                     </Button>
                 )}
             </div>
-
-            {previewImage && (
-                <div>
-                    <img 
-                        id="preView" 
-                        className="rounded shadow d-block mx-auto img-fluid" 
-                        src={previewImage} 
-                        alt="Pré-visualização" 
-                    />
-                </div>
-            )}
         </div>
     );
 };

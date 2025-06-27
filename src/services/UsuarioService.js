@@ -1,6 +1,7 @@
 import http from '../common/http-common';
 const API_URL = "usuario/";
 
+
 const findAll = () => {
     return http.mainInstance.get(API_URL + 'findAll');
 };
@@ -47,7 +48,7 @@ const create = data => {
 };
 
 const update = (id, data) => {
-    return http.multipartInstance.put(API_URL + `update/${id}`, data);
+    return http.multipartInstance.put(API_URL + `editar/${id}`, data);
 };
 
 const inativar = (id) => {
@@ -69,8 +70,12 @@ const findByNome = nome => {
     return http.mainInstance.get(API_URL + `findByNome?nome=${nome}`);
 };
 
+const setCurrentUser = (usuario) => {
+    localStorage.setItem("user", JSON.stringify(usuario));
+};
 
 const UsuarioService = {
+    setCurrentUser,
     findAll,
     findById,
     signup,

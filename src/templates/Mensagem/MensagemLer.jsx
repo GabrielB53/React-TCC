@@ -1,9 +1,82 @@
-import { Link } from "react-router-dom"
-import Header from "../../components/Header/Header"
-import Sidebar from '../../components/Menu/Sidebar'
-import logo from '../../assets/images/home.png'
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Sidebar from "../../components/Menu/Sidebar";
+import MensagemService from "../../services/MensagemService";
+import logo from "../../assets/images/home.png";
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const MensagemLer = () => {
+    const { id } = useParams();
+    const { theme } = useContext(ThemeContext);
+
+    const [mensagem, setMensagem] = useState({
+        id: null,
+        dataMensagem: "",
+        email: "",
+        emissor: "",
+        texto: "",
+        telefone: "",
+        statusMensagem: ""
+    });
+
+    const [alerta, setAlerta] = useState({
+        show: false,
+        message: '',
+        type: '', // 'success', 'error', 'warning', 'info'
+    });
+
+    useEffect(() => {
+        carregarMensagem();
+    }, []);
+
+    const carregarMensagem = async () => {
+        try {
+            const response = await MensagemService.findById(id);
+            setMensagem(response.data);
+        } catch (error) {
+            exibirAlerta("Erro ao carregar a mensagem.", "error");
+        }
+    };
+
+    const exibirAlerta = (message, type = 'info') => {
+        setAlerta({ show: true, message, type });
+        setTimeout(() => {
+            setAlerta({ show: false, message: '', type: '' });
+        }, 4000);
+    };
+
+    const marcarComoLida = async () => {
+        try {
+            const response = await MensagemService.marcarComoLida(id);
+            exibirAlerta(response.data.message, "success");
+            carregarMensagem();
+        } catch (error) {
+            const msg = error.response?.data?.message || "Erro ao marcar como lida.";
+            exibirAlerta(msg, "error");
+        }
+    };
+
+    const inativarMensagem = async () => {
+        try {
+            const response = await MensagemService.inativar(id);
+            exibirAlerta(response.data.message, "warning");
+            carregarMensagem();
+        } catch (error) {
+            const msg = error.response?.data?.message || "Erro ao inativar a mensagem.";
+            exibirAlerta(msg, "error");
+        }
+    };
+
+    const textColor = theme === 'Claro' ? '' : 'white';
+    const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
 
     return (
         <div className="d-flex">
@@ -11,60 +84,168 @@ const MensagemLer = () => {
             <div className="p-3 w-100">
                 <Header
                     goto={'/mensagem'}
-                    title={'Ler Mensagem'}
+                    title={"Ler Mensagem"}
                     logo={logo}
                 />
-                <section className="m-2 p-2 shadow-lg">
-                    <form className="mx-5 p-2 border">
-                        <div className="row my-3 g-1">
-                            <label htmlFor="inputID" className="col-md-1 col-form-label">ID:</label>
-                            <div class="col-md-2">
-                                <input type="text" className="form-control" id="inputID" readOnly />
-                            </div>
 
-                            <label htmlFor="inputData" className="col-md-2 col-form-label">Data:</label>
-                            <div class="col-md-3">
-                                <input type="text" className="form-control" id="inputData" readOnly />
-                            </div>
+                <section className="m-2 p-2">
+                    {alerta.show && (
+                        <Alert
+                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+                            severity={alerta.type}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                right: 16,
+                                zIndex: 1000,
+                            }}
+                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
+                        >
+                            {alerta.message}
+                        </Alert>
+                    )}
 
-                            <label htmlFor="inputStatus" className="col-md-2 col-form-label">Status:</label>
-                            <div class="col-md-2">
-                                <input type="text" className="form-control" id="inputStatus" readOnly />
-                            </div>
-                        </div>
-                        <div className="row mb-1">
-                            <label htmlFor="inputEmissor" className="col-md-2 col-form-label">Emissor:</label>
-                            <div class="col-md-10">
-                                <input type="text" className="form-control" id="inputEmissor" readOnly />
-                            </div>
-                        </div>
-                        <div className="row mb-3">
-                            <label htmlFor="inputEmail" className="col-md-2 col-form-label">Email:</label>
-                            <div class="col-md-10">
-                                <input type="email" className="form-control" id="inputEmail" readOnly />
-                            </div>
-                        </div>
+                    <form noValidate autoComplete="off">
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={2}>
+                                <TextField
+                                    fullWidth
+                                    label="ID"
+                                    value={mensagem.id || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
 
-                        <div className="col-md-12 mb-2">
-                            <label htmlFor="inputTexto" className="form-label">Mensagem:</label>
-                            <textarea rows={5} className="form-control" id="inputTexto" >
-                                </textarea>
-                        </div>
-                        
+                            <Grid item xs={12} sm={5}>
+                                <TextField
+                                    fullWidth
+                                    label="Data"
+                                    value={mensagem.dataMensagem || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
 
-                        <div className="col-12 d-flex justify-content-around">
-                            <button type="submit" className="btn btn-warning">
-                                Marcar com Lida
-                            </button>
-                            <button type="submit" className="btn btn-danger">
-                                Inativar
-                            </button>
-                        </div>
+                            <Grid item xs={12} sm={5}>
+                                <TextField
+                                    fullWidth
+                                    label="Status"
+                                    value={mensagem.statusMensagem || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Emissor"
+                                    value={mensagem.emissor || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Email"
+                                    value={mensagem.email || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Mensagem"
+                                    multiline
+                                    rows={6}
+                                    value={mensagem.texto || ""}
+                                    InputProps={{ readOnly: true, style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} container justifyContent="space-around" sx={{ mt: 2 }}>
+                                <Button
+                                    variant="outlined"
+                                    color="warning"
+                                    onClick={marcarComoLida}
+                                >
+                                    Marcar como Lida
+                                </Button>
+
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={inativarMensagem}
+                                >
+                                    Inativar
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </form>
                 </section>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default MensagemLer
+export default MensagemLer;

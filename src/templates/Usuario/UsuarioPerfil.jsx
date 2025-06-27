@@ -1,140 +1,167 @@
-import { Link, useNavigate, useParams } from "react-router-dom"
-import Header from "../../components/Header/Header"
-import Sidebar from '../../components/Menu/Sidebar'
-import logo from '../../assets/images/Logozinha.png'
-import perfil from '../../assets/images/Logozinha.png'
-import { useEffect, useRef, useState } from "react"
-import UsuarioService from "../../services/UsuarioService"
+import { useNavigate, useParams } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Sidebar from '../../components/Menu/Sidebar';
+import logo from '../../assets/images/Logozinha.png';
+import perfil from '../../assets/images/Logozinha.png';
+import { useEffect, useState } from "react";
+import UsuarioService from "../../services/UsuarioService";
 import './Usuario.css';
-import ImageUploaderModal from "../../components/ImageUploader/ImageUploaderModal"
+import ImageUploaderModal from "../../components/ImageUploader/ImageUploaderModal";
 import ThemeToggleButton from '../../components/Botoes/TrocarCor';
 import { Button, ButtonGroup } from '@mui/material';
+import { useUser } from '../../contexts/UserContext';
+
 
 const UsuarioPerfil = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const { currentUser, setCurrentUser } = useUser();
 
-    const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+  const [nome, setNome] = useState("");
+  const [dataFile, setDataFile] = useState(null);
+  const [chosenImage, setChosenImage] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [successful, setSuccessful] = useState(false);
 
-    const objectValues = {
-        id: null,
-        nome: "",
-        email: "",
-        nivelAcesso: ""
-    };
+  useEffect(() => {
+    UsuarioService.findById(id)
+      .then(response => {
+        setUsuario(response.data);
+        setNome(response.data.nome || "");
+        if (response.data.foto) {
+          setChosenImage(response.data.foto);
+        } else {
+          setChosenImage(null);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, [id]);
 
-    const [usuario, setUsuario] = useState(objectValues);
+  const setFile = (file) => setDataFile(file);
+  const setImage = (img) => setChosenImage(img);
 
-    const { id } = useParams();
-    const _dbRecords = useRef(true);
-    const [formData, setFormData] = useState({});
-    const [successful, setSuccessful] = useState(false);
-    const [message, setMessage] = useState();
-    const [dataFile, setDataFile] = useState();
-    const [chosenImage, setChosenImage] = useState();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const setFile = (dataFile) => {
-        setDataFile(dataFile);
+    const form = new FormData();
+    form.append("nome", nome);
+
+    // Enviar nível de acesso atual (para não perder)
+    if (usuario?.nivelAcesso) {
+      form.append("nivelAcesso", usuario.nivelAcesso);
     }
 
-    const setImage = (dataImage) => {
-        setChosenImage(dataImage);
+    if (dataFile) {
+      form.append("file", dataFile);
     }
 
+    try {
+      await UsuarioService.update(id, form);
+      setSuccessful(true);
+      setMessage("Alterações salvas com sucesso!");
 
-    const handleChange = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
-        setFormData(formData => ({ ...formData, [name]: value }));
+      const response = await UsuarioService.findById(id);
+      setUsuario(response.data);
+      setNome(response.data.nome || "");
+      if (response.data.foto) {
+        setChosenImage(response.data.foto);
+      } else {
+        setChosenImage(null);
+      }
+
+      setCurrentUser(response.data);
+      
+    } catch (error) {
+      setSuccessful(false);
+      setMessage("Erro ao salvar alterações.");
+      console.error(error);
     }
+  };
 
-    useEffect(() => {
-        UsuarioService.findById(id).then(
-            (response) => {
-                const usuario = response.data;
-                setUsuario(usuario);
-                console.log(usuario);
-            }
-        ).catch((error) => {
-            console.log(error);
-        })
-    }, []);
+  const goToAlterarSenha = () => navigate(`/usuarioalterarsenha/${id}`);
 
+  if (!usuario) return <div>Carregando...</div>;
 
-    const goToAlterarSenha = () => {
-        navigate(`/usuarioalterarsenha/` + id);
-    }
-
-    /*
-        A propriedade 'value' para um campo de formulário sem um manipulador 'onChange', 
-        faz com que o campo seja renderizado como somente de leitura. 
-        Se o campo deve ser mutável, deve ser utilizada a propriedade 'defaultValue'. 
-        Caso contrário, deve ser definida 'onChange' ou 'readOnly'.
-    */
-    return (
-        <div className="d-flex">
-            <Sidebar />
-            <div className="p-3 w-100">
-                <Header
-                    goto={'/home'}
-                    title={'Perfil de Usuário'}
-                    logo={logo}
-                />
-                <section className="m-1 p-1 shadow-lg">
-                    <form className="form-perfil row g-2 rounded-2 shadow">
-                        <div className="col-md-12">
-                            <img src={usuario.foto ? usuario.foto : perfil} alt="..." />
-                        </div>
-                        <div className="col-md-6 d-flex align-items-center">
-                            <ImageUploaderModal
-                                setFile={setFile}
-                                setImage={setImage}
-                                chosenImage={chosenImage} />
-                        </div>
-                        <div className="col-md-6 d-flex align-items-center">
-                            <ThemeToggleButton />
-                        </div>
-                        <div className="col-md-12 mb-3">
-                            <label htmlFor="inputNome" className="form-label mb-1 fw-bold">Nome:</label>
-                            <input type="text" className="form-control" id="inputNome"
-                                defaultValue={usuario.nome} />
-                        </div>
-                        <div className="col-md-12 mb-3">
-                            <label htmlFor="inputEmail4" className="form-label mb-1 fw-bold">Email:</label>
-                            <input type="email" className="form-control text-center" id="inputEmail4" readOnly
-                                defaultValue={usuario.email} />
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-                            <label htmlFor="inputnivelAcesso" className="form-label mb-1 fw-bold">Nível de Acesso:</label>
-                            <input type="text" className="form-control text-center" id="inputnivelAcesso" readOnly
-                                defaultValue={usuario.nivelAcesso} />
-                        </div>
-                        <div className="col-md-6 mb-3">
-                            <label htmlFor="inputStatus" className="form-label mb-1 fw-bold">Status:</label>
-                            <input type="text" className="form-control text-center" id="inputStatus" readOnly
-                                defaultValue={usuario.statusUsuario} />
-                        </div>
-                        <div className="col-12 mb-2 d-flex justify-content-between">
-                            <ButtonGroup variant="contained" spacing={2}>
-                                <Button
-                                    type="submit"
-                                    color="primary"
-                                    sx={{ boxShadow: 2 }}>
-                                    Gravar Alterações
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={goToAlterarSenha}
-                                    color="error"
-                                    sx={{ boxShadow: 2 }}>
-                                    Alterar a Senha
-                                </Button>
-                            </ButtonGroup>
-                        </div>
-                    </form>
-                </section>
+  return (
+    <div className="d-flex">
+      <Sidebar />
+      <div className="p-3 w-100">
+        <Header goto={'/home'} title={'Perfil de Usuário'} logo={logo} />
+        <section className="m-1 p-1 shadow-lg">
+          <form className="form-perfil row g-2 rounded-2 shadow" onSubmit={handleSubmit}>
+            <div className="col-md-12 text-center">
+              <img
+                src={chosenImage || perfil}
+                alt="Foto do usuário"
+                style={{ maxWidth: '150px', maxHeight: '150px', borderRadius: '50%' }}
+              />
             </div>
-        </div>
-    )
-}
+            <div className="col-md-12 d-flex align-items-center justify-content-center">
+              <ImageUploaderModal setFile={setFile} setImage={setImage} />
+            </div>
+            <div className="col-md-12 mb-3">
+              <label htmlFor="inputNome" className="form-label mb-1 fw-bold">Nome:</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputNome"
+                value={nome || ""}
+                onChange={e => setNome(e.target.value)}
+              />
+            </div>
+            <div className="col-md-12 mb-3">
+              <label className="form-label mb-1 fw-bold">Email:</label>
+              <input
+                type="email"
+                className="form-control text-center"
+                readOnly
+                value={usuario.email || ""}
+              />
+            </div>
+            <div className="col-md-6 mb-3">
+              <label className="form-label mb-1 fw-bold">Nível de Acesso:</label>
+              <input
+                type="text"
+                className="form-control text-center"
+                readOnly
+                value={usuario.nivelAcesso || ""}
+              />
+            </div>
+            <div className="col-md-6 mb-3">
+              <label className="form-label mb-1 fw-bold">Status:</label>
+              <input
+                type="text"
+                className="form-control text-center"
+                readOnly
+                value={usuario.statusUsuario || ""}
+              />
+            </div>
+            <div className="col-12 mb-2 d-flex justify-content-between">
+              <ButtonGroup variant="contained" spacing={2}>
+                <Button type="submit" color="primary" sx={{ boxShadow: 2 }}>
+                  Gravar Alterações
+                </Button>
+                <Button type="button" onClick={goToAlterarSenha} color="error" sx={{ boxShadow: 2 }}>
+                  Alterar a Senha
+                </Button>
+              </ButtonGroup>
+            </div>
+            <div className="col-md-6 d-flex align-items-center">
+              <ThemeToggleButton />
+            </div>
+            {message && (
+              <div className={`mt-2 ${successful ? 'text-success' : 'text-danger'}`}>
+                {message}
+              </div>
+            )}
+          </form>
+        </section>
+      </div>
+    </div>
+  );
+};
 
-export default UsuarioPerfil
+export default UsuarioPerfil;

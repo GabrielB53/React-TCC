@@ -6,6 +6,7 @@ import logo from '../../assets/images/home.png';
 
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
+import { useNavigate } from 'react-router-dom';
 
 const MensagensLista = () => {
   const recordsPerPage = [2, 4, 6];
@@ -14,7 +15,11 @@ const MensagensLista = () => {
   const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage[0]);
   const [pages, setPages] = useState(0);
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
 
+  const lerMensagem = (id) => {
+    navigate(`/mensagemler/${id}`);
+  };
   // Estado do alerta
   const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
 
@@ -189,6 +194,7 @@ const MensagensLista = () => {
                         className="btn btn-sm btn-success"
                         aria-label={`Abrir mensagem ${mensagem.id}`}
                         title={`Abrir mensagem ${mensagem.id}`}
+                        onClick={() => lerMensagem(mensagem.id)}
                       >
                         <i className="bi bi-folder2-open"></i>
                       </button>

@@ -4,35 +4,31 @@ import React, { createContext, useState, useEffect } from 'react';
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState('Claro');
+  const [theme, setTheme] = useState(() => {
+    // Inicializa direto do localStorage para evitar render inicial errado
+    return localStorage.getItem('tema') || 'Claro';
+  });
 
-    // Carrega o tema salvo no localStorage ou define como 'Claro' por padrão
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('tema') || 'Claro';
-        setTheme(savedTheme);
-        applyTheme(savedTheme); // Aplica o tema no body
-    }, []);
+  useEffect(() => {
+    applyTheme(theme);
+    localStorage.setItem('tema', theme);
+  }, [theme]);
 
-    // Função para aplicar o tema diretamente no body
-    const applyTheme = (theme) => {
-        if (theme === 'Escuro') {
-            document.body.classList.add('dark-theme');
-        } else {
-            document.body.classList.remove('dark-theme');
-        }
-    };
+  const applyTheme = (theme) => {
+    if (theme === 'Escuro') {
+      document.body.classList.add('dark-theme');
+    } else {
+      document.body.classList.remove('dark-theme');
+    }
+  };
 
-    // Função para alternar entre 'Claro' e 'Escuro'
-    const toggleTheme = () => {
-        const newTheme = theme === 'Claro' ? 'Escuro' : 'Claro';
-        setTheme(newTheme);
-        localStorage.setItem('tema', newTheme); // Salva no localStorage
-        applyTheme(newTheme); // Aplica o tema no body
-    };
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'Claro' ? 'Escuro' : 'Claro'));
+  };
 
-    return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
