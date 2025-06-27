@@ -1,48 +1,34 @@
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
-import Sidebar from '../../components/Menu/Sidebar';
-import logo from '../../assets/images/home.png';
-import axios from 'axios';
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"
+import Header from "../../components/Header/Header"
+import Sidebar from '../../components/Menu/Sidebar'
+import logo from '../../assets/images/home.png'
+import UsuarioService from "../../services/UsuarioService"
+import { useEffect, useState } from "react"
 
 const UsuariosLista = () => {
-    
-    const [dados, setDados] = useState([])
+
     const navigate = useNavigate();
 
-    function receberDados(){
-        axios.get('http://localhost:8080/usuario'
-        ).then(response => {
-            console.log(response.data)
-            setDados(response.data)
-        })
-        .catch(error => console.log(error))
+    const goTo = () => {
+        navigate('/usuarioeditar')
     }
-    useEffect(()=>{
-        receberDados()
-    }, [])
 
+    const [usuarios, setUsuarios] = useState([]);
 
+    useEffect(() => {
+        UsuarioService.findAll().then(
+            (response) => {
+                const usuarios = response.data;
+                setUsuarios(usuarios);
+            }
+        ).catch((error) => {
+            console.log(error);
+        })
+    }, []);
 
-
-    const ItensTable = () => dados.map(
-        usuario => (
-            <tr key={usuario.id}>
-                <td>{usuario.id}</td>
-                <td>{usuario.nome}</td>
-                <td>{usuario.email}</td>
-                <td>{usuario.tipoUsuario}</td>
-                <td>
-                    <button
-                        className="btn btn-danger"
-                        onClick={() => navigate('/usuarioeditar', { state: { usuario } })}
-                    >
-                        Alterar
-                    </button>
-                </td>
-            </tr>
-        )
-    );
+    const editar = (id) => {
+        navigate(`/usuarioeditar/` + id)
+    }
 
     return (
         <div className="d-flex">
@@ -61,19 +47,36 @@ const UsuariosLista = () => {
                                     <th scope="col">ID</th>
                                     <th scope="col">Nome</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Acesso</th>
+                                    <th scope="col">Cadastro</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Ações</th>
+                                    <th scope="col">Abrir</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <ItensTable />
+                                {usuarios?.map((usuario) => (
+                                    <tr className="" key={usuario.id}>
+                                        <td>{usuario.id}</td>
+                                        <td>{usuario.nome}</td>
+                                        <td>{usuario.email}</td>
+                                        <td>{usuario.nivelAcesso}</td>
+                                        <td>{usuario.dataCadastro}</td>
+                                        <td>{usuario.statusUsuario}</td>
+                                        <td>
+                                            <button onClick={() => editar(usuario.id)}
+                                                className="btn btn-sm btn-warning rounded">
+                                                <i className="bi bi-envelope-open"> Abrir</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </section>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default UsuariosLista;
+export default UsuariosLista

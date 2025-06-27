@@ -1,37 +1,79 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
-import { Formik } from "formik";
-import * as Yup from 'yup';
-import axios from "axios";
+import { useEffect, useState } from "react";
+import UsuarioService from "../../services/UsuarioService";
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
 
 const UsuarioEditar = () => {
-    const { state } = useLocation(); // Pega os dados do usuário via location state
-    const usuario = state.usuario; // Extrai o usuário do state
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
 
-    const validationSchema = Yup.object().shape({
-        nome: Yup.string().required('Nome é obrigatório'),
-        email: Yup.string().email('Email inválido').required('Email é obrigatório'),
-        senha: Yup.string(),
-        tipoUsuario: Yup.string().required('Selecione um tipo de usuário')
+    const [usuario, setUsuario] = useState({
+        id: null,
+        nome: "",
+        email: "",
+        nivelAcesso: "",
+        dataCadastro: "",
+        statusUsuario: ""
     });
 
-    const handleFormSubmit = (values) => {
-        axios.put(`http://localhost:8080/usuario/${usuario.id}`, values)
-            .then(response => {
+    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
+
+    useEffect(() => {
+        UsuarioService.findById(id)
+            .then((response) => {
+                setUsuario(response.data);
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+                setAlerta({ show: true, message: 'Erro ao buscar usuário.', type: 'error' });
+            });
+    }, [id]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setUsuario(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        UsuarioService.atualizar(id, usuario)
+            .then(() => {
                 setAlerta({ show: true, message: 'Usuário atualizado com sucesso!', type: 'success' });
+            })
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao atualizar usuário.', type: 'error' });
+            });
+    };
+
+    const inativar = () => {
+        UsuarioService.inativar(id)
+            .then(() => {
+                setAlerta({ show: true, message: 'Usuário inativado com sucesso!', type: 'success' });
                 setTimeout(() => {
                     navigate('/usuarioslista');
                 }, 2000);
             })
-            .catch(error => {
-                setAlerta({ show: true, message: 'Erro ao atualizar usuário.', type: 'error' });
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao inativar usuário.', type: 'error' });
+            });
+    };
+
+    const reativar = () => {
+        UsuarioService.reativar(id)
+            .then(() => {
+                setAlerta({ show: true, message: 'Usuário reativado com sucesso!', type: 'success' });
+                setTimeout(() => {
+                    navigate('/usuarioslista');
+                }, 2000);
+            })
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao reativar usuário.', type: 'error' });
             });
     };
 
@@ -60,96 +102,77 @@ const UsuarioEditar = () => {
                             {alerta.message}
                         </Alert>
                     )}
-                    <Formik
-                        initialValues={usuario} // Usa os dados do usuário como initialValues
-                        validationSchema={validationSchema}
-                        onSubmit={handleFormSubmit}
-                    >
-                        {props => (
-                            <form onSubmit={props.handleSubmit} className="row g-3">
-                                <div className="col-md-2">
-                                    <label htmlFor="inputID" className="form-label">ID</label>
-                                    <input type="text" className="form-control" id="inputID" readOnly 
-                                        value={usuario.id} />
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputNome" className="form-label">Nome</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="inputNome"
-                                        name="nome"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.nome}
-                                    />
-                                    {props.touched.nome && props.errors.nome && (
-                                        <div id="feedback">{props.errors.nome}</div>
-                                    )}
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputEmail4" className="form-label">Email</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        id="inputEmail4"
-                                        name="email"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.email}
-                                    />
-                                    {props.touched.email && props.errors.email && (
-                                        <div id="feedback">{props.errors.email}</div>
-                                    )}
-                                </div>
 
-                                <div className="col-md-5">
-                                    <label htmlFor="inputSenha" className="form-label">Senha (Deixe em branco para não alterar)</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        id="inputSenha"
-                                        name="senha"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.senha}
-                                    />
-                                    {props.touched.senha && props.errors.senha && (
-                                        <div id="feedback">{props.errors.senha}</div>
-                                    )}
-                                </div>
+                    <form className="row g-2 m-5 p-2 rounded-2 shadow" onSubmit={handleSubmit}>
+                        <div className="col-md-2">
+                            <label htmlFor="inputID" className="form-label mb-1 fw-bold">ID:</label>
+                            <input type="text" className="form-control" id="inputID" readOnly value={usuario.id || ''} />
+                        </div>
 
-                                <div className="col-md-4">
-                                    <label htmlFor="inputAcesso" className="form-label">Acesso</label>
-                                    <select
-                                        id="inputAcesso"
-                                        className="form-select"
-                                        name="tipoUsuario"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.tipoUsuario}
-                                    >
-                                        <option value="">Selecione o tipo</option>
-                                        <option value="Aluno">Aluno</option>
-                                        <option value="Funcionario">Funcionário</option>
-                                    </select>
-                                    {props.touched.tipoUsuario && props.errors.tipoUsuario && (
-                                        <div id="feedback">{props.errors.tipoUsuario}</div>
-                                    )}
-                                </div>
+                        <div className="col-md-5">
+                            <label htmlFor="inputNome" className="form-label mb-1 fw-bold">Nome:</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="inputNome"
+                                name="nome"
+                                value={usuario.nome}
+                                onChange={handleChange}
+                            />
+                        </div>
 
-                                <div className="col-12 d-flex justify-content-between">
-                                    <button type="submit" className="btn btn-primary">
-                                        Gravar Alterações
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-                    </Formik>
+                        <div className="col-md-5">
+                            <label htmlFor="inputEmail4" className="form-label mb-1 fw-bold">Email:</label>
+                            <input
+                                type="email"
+                                className="form-control"
+                                id="inputEmail4"
+                                name="email"
+                                value={usuario.email}
+                                onChange={handleChange}
+                            />
+                        </div>
+
+                        <div className="col-md-4 my-3">
+                            <label htmlFor="inputData" className="form-label mb-1 fw-bold">Data de Cadastro:</label>
+                            <input type="text" className="form-control" id="inputData" readOnly value={usuario.dataCadastro || ''} />
+                        </div>
+
+                        <div className="col-md-4 my-3">
+                            <label htmlFor="inputStatus" className="form-label mb-1 fw-bold">Status:</label>
+                            <input type="text" className="form-control" id="inputStatus" readOnly value={usuario.statusUsuario || ''} />
+                        </div>
+
+                        <div className="col-md-4 my-3">
+                            <label htmlFor="inputAcesso" className="form-label mb-1 fw-bold">Acesso:</label>
+                            <select
+                                id="inputAcesso"
+                                name="nivelAcesso"
+                                className="form-select"
+                                value={usuario.nivelAcesso}
+                                onChange={handleChange}
+                            >
+                                <option value="USER">USER</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
+                        </div>
+
+                        <div className="col-12 mb-2 d-flex justify-content-between">
+                            <button type="submit" className="btn btn-primary">
+                                Gravar Alterações
+                            </button>
+                            <button type="button" className="btn btn-warning" onClick={reativar}>
+                                Reativar / Resetar a Senha
+                            </button>
+                            <button type="button" className="btn btn-danger" onClick={inativar}>
+                                Inativar Conta
+                            </button>
+                        </div>
+                    </form>
                 </section>
             </div>
         </div>
     );
-}
+};
 
 export default UsuarioEditar;
