@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
+import { Button } from '@mui/material'; // Importando o Button do Material-UI
 import './ImageUploader.css';
 
-const ImageUploader = ({setFile}) => {
+const ImageUploader = ({ setFile }) => {
     const [currentFile, setCurrentFile] = useState(undefined);
     const [previewImage, setPreviewImage] = useState(undefined);
 
-
     const selectFile = (event) => {
-        const currentFile = event.target.files[0];
-        const previewImage = URL.createObjectURL(event.target.files[0]);
-        setCurrentFile(currentFile);
+        const selectedFile = event.target.files[0];
+        const previewImage = URL.createObjectURL(selectedFile);
+        setCurrentFile(selectedFile);
         setPreviewImage(previewImage);
     };
 
     useEffect(() => {
         setFile(currentFile);
-    }, [currentFile]);
+    }, [currentFile, setFile]);
 
-    const deleteFile = (event) => {
+    const deleteFile = () => {
         setCurrentFile(undefined);
         setPreviewImage(undefined);
     };
@@ -26,20 +26,41 @@ const ImageUploader = ({setFile}) => {
         <div className="img-card">
             <div className="d-flex">
                 <label htmlFor="uploadImage" className="btn-open-image">
-                    <i className="bi bi-image"></i>
-                    <input type="file" name="file" accept="image/*" id="uploadImage" 
-                    onChange={selectFile} />
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        component="span" // Isso permite disparar o input de tipo file
+                        startIcon={<i className="bi bi-image"></i>}
+                    >
+                        Escolher Imagem
+                    </Button>
                 </label>
-                <p className="fw-bold fst-italic d-block mx-auto">{ currentFile != null ? currentFile.name : 'Nenhum arquivo escolhido'}</p>
-                <button type="button" className="btn-close-image" onClick={deleteFile}>
-                    <i className="bi bi-x-circle"></i>
-                </button>
+
+                <p className="fw-bold fst-italic d-block mx-auto">
+                    {currentFile ? currentFile.name : 'Nenhum arquivo escolhido'}
+                </p>
+
+                {currentFile && (
+                    <Button 
+                        variant="contained" 
+                        color="error" 
+                        size="small" 
+                        onClick={deleteFile}
+                        startIcon={<i className="bi bi-x-circle"></i>}
+                    >
+                        Excluir
+                    </Button>
+                )}
             </div>
 
             {previewImage && (
                 <div>
-                    <img id="preView" className="rounded shadow d-block mx-auto img-fluid"
-                        src={previewImage} alt="..." />
+                    <img 
+                        id="preView" 
+                        className="rounded shadow d-block mx-auto img-fluid" 
+                        src={previewImage} 
+                        alt="Pré-visualização" 
+                    />
                 </div>
             )}
         </div>

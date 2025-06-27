@@ -1,9 +1,10 @@
-import { Link, useNavigate } from "react-router-dom"
-import Header from "../../components/Header/Header"
-import Sidebar from '../../components/Menu/Sidebar'
-import logo from '../../assets/images/home.png'
-import { useEffect, useState } from "react"
-import MensagemService from "../../services/MensagemService"
+import { Link, useNavigate } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Sidebar from '../../components/Menu/Sidebar';
+import logo from '../../assets/images/home.png';
+import { useEffect, useState } from "react";
+import MensagemService from "../../services/MensagemService";
+import { Button, Badge, Typography, Box } from '@mui/material'; // Importando componentes do MUI
 
 const Mensagem = () => {
     const navigate = useNavigate();
@@ -17,12 +18,12 @@ const Mensagem = () => {
             }
         ).catch((error) => {
             console.log(error);
-        })
+        });
     }, []);
 
     const lerMensagem = (id) => {
-        navigate(`/mensagemler/` + id)
-    }
+        navigate(`/mensagemler/` + id);
+    };
 
     return (
         <div className="d-flex">
@@ -34,18 +35,26 @@ const Mensagem = () => {
                     logo={logo}
                 />
                 <section className="p-2 m-2 shadow-lg">
-                    <div className="m-2">
-                        <div className="btn btn-info position-relative fw-bold">
+                    <Box m={2}>
+                        <Button variant="contained" color="info" sx={{ position: 'relative' }}>
                             Total de Mensagens
-                            <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {mensagens.length}
-                                <span className="visually-hidden">total de mensagens</span>
-                            </span>
-                        </div>
-                        <Link className="btn btn-success ms-3 shadow-lg" to={'/mensagemlista'}>
-                            Lista
+                            <Badge
+                                badgeContent={mensagens.length}
+                                color="error"
+                                sx={{
+                                    position: 'absolute',
+                                    top: -1,
+                                    right: -1,
+                                    transform: 'translate(50%, -50%)',
+                                }}
+                            />
+                        </Button>
+                        <Link to={'/mensagemlista'} style={{ textDecoration: 'none' }}>
+                            <Button variant="contained" color="success" sx={{ ml: 2 }}>
+                                Lista
+                            </Button>
                         </Link>
-                    </div>
+                    </Box>
                     <div className="table-wrapper">
                         <table className="table table-striped table-hover">
                             <thead>
@@ -59,29 +68,38 @@ const Mensagem = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {mensagens?.map((mensagem) => (
-                                    <tr key={mensagem.id}>
-                                        <td scope="row">{mensagem.id}</td>
-                                        <td>{mensagem.dataMensagem}</td>
-                                        <td>{mensagem.emissorMensagem}</td>
-                                        <td>{mensagem.email}</td>
-                                        <td>{mensagem.statusMensagem}</td>
-                                        <td>
-                                            <button type="button" onClick={() => lerMensagem(mensagem.id)}
-                                                className="btn btn-sm btn-warning">
-                                                <i className="bi bi-envelope-open me-2"></i>Abrir
-                                            </button>
-                                        </td>
+                                {mensagens?.map((mensagem) => {
+                                    // Formatar a data para dd/mm/yyyy
+                                    const dataFormatada = new Date(mensagem.dataMensagem).toLocaleDateString('pt-BR');
 
-                                    </tr>
-                                ))}
+                                    return (
+                                        <tr key={mensagem.id}>
+                                            <td scope="row">{mensagem.id}</td>
+                                            <td>{dataFormatada}</td>
+                                            <td>{mensagem.emissorMensagem}</td>
+                                            <td>{mensagem.email}</td>
+                                            <td>{mensagem.statusMensagem}</td>
+                                            <td>
+                                                <Button
+                                                    variant="contained"
+                                                    color="warning"
+                                                    onClick={() => lerMensagem(mensagem.id)}
+                                                    size="small"
+                                                    sx={{ display: 'flex', alignItems: 'center' }}
+                                                >
+                                                    <i className="bi bi-envelope-open me-2"></i>Abrir
+                                                </Button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 </section>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Mensagem
+export default Mensagem;
