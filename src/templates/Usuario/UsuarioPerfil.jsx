@@ -59,7 +59,7 @@ const UsuarioPerfil = () => {
     }
 
     try {
-      await UsuarioService.update(id, form);
+      await UsuarioService.updateProfile(id, form);
       setSuccessful(true);
       setMessage("Alterações salvas com sucesso!");
 

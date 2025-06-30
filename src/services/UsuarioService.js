@@ -51,6 +51,10 @@ const update = (id, data) => {
     return http.multipartInstance.put(API_URL + `editar/${id}`, data);
 };
 
+const updateProfile = (id, data) => {
+    return http.multipartInstance.put(API_URL + `editarPerfil/${id}`, data);
+};
+
 const inativar = (id) => {
     return http.multipartInstance.put(API_URL + `inativar/${id}`);
 };
@@ -75,6 +79,7 @@ const setCurrentUser = (usuario) => {
 };
 
 const UsuarioService = {
+    updateProfile,
     setCurrentUser,
     findAll,
     findById,

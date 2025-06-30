@@ -42,9 +42,12 @@ const UsuarioEditar = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        UsuarioService.atualizar(id, usuario)
+        UsuarioService.update(id, usuario)
             .then(() => {
                 setAlerta({ show: true, message: 'Usuário atualizado com sucesso!', type: 'success' });
+                setTimeout(() => {
+                    navigate('/usuarioslista');
+                }, 1000);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao atualizar usuário.', type: 'error' });
@@ -57,7 +60,7 @@ const UsuarioEditar = () => {
                 setAlerta({ show: true, message: 'Usuário inativado com sucesso!', type: 'success' });
                 setTimeout(() => {
                     navigate('/usuarioslista');
-                }, 2000);
+                }, 1000);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao inativar usuário.', type: 'error' });

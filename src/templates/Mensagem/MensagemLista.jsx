@@ -9,7 +9,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { useNavigate } from 'react-router-dom';
 
 const MensagensLista = () => {
-  const recordsPerPage = [2, 4, 6];
+  const recordsPerPage = [6, 8, 10];
   const [records, setRecords] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage[0]);
@@ -28,20 +28,36 @@ const MensagensLista = () => {
     setPage(0);
   };
 
+  const findAll = () => {
+    MensagemService.findAll()
+      .then((response) => {
+        const data = response.data || [];
+        setRecords(data);
+        setPage(0);
+        setPages(Math.ceil(data.length / rowsPerPage));
+        setAlerta({ show: false, message: '', type: '' });
+      })
+      .catch((error) => {
+        console.error('Erro ao buscar todas as mensagens:', error);
+        setRecords([]);
+        setPages(0);
+        setPage(0);
+        setAlerta({ show: true, message: 'Erro ao carregar mensagens.', type: 'error' });
+      });
+  };
+
   const onChangeSearch = (e) => {
     setSearch(e.target.value);
   };
 
   const findByEmail = () => {
     const trimmedEmail = search.trim();
+  
     if (!trimmedEmail) {
-      setRecords([]);
-      setPages(0);
-      setPage(0);
-      setAlerta({ show: false, message: '', type: '' });
+      findAll();
       return;
     }
-
+  
     MensagemService.findByEmail(trimmedEmail)
       .then((response) => {
         const data = response.data || [];
@@ -67,6 +83,10 @@ const MensagensLista = () => {
     e.preventDefault();
     findByEmail();
   };
+
+  useEffect(() => {
+    findAll();
+  }, []);
 
   useEffect(() => {
     setPages(Math.ceil(records.length / rowsPerPage));
@@ -204,7 +224,7 @@ const MensagensLista = () => {
               </tbody>
             </table>
             <hr />
-            <div className="bg-warning bg-opacity-25 d-flex justify-content-between align-items-center px-2 rounded-2">
+            <div className=" bg-opacity-25 d-flex justify-content-between align-items-center px-2 rounded-2">
               <div className="me-1 fw-bold">
                 <span>Quantidade de Registros: </span>
                 <span>{records.length}</span>
