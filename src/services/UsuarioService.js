@@ -79,7 +79,6 @@ const setCurrentUser = (usuario) => {
 };
 
 const UsuarioService = {
-    updateProfile,
     setCurrentUser,
     findAll,
     findById,
@@ -89,6 +88,7 @@ const UsuarioService = {
     getCurrentUser,
     create,
     update,
+    updateProfile,
     inativar,
     reativar,
     alterarSenha,
