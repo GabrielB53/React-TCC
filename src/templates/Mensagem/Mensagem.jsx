@@ -2,14 +2,18 @@ import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MensagemService from "../../services/MensagemService";
 import { Button, Badge, Box } from '@mui/material';
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const Mensagem = () => {
     const navigate = useNavigate();
     const [mensagens, setMensagens] = useState([]);
     const [mostrarInativas, setMostrarInativas] = useState(false); // 👈 novo estado
+    const { theme } = useContext(ThemeContext);
+    const buttonColor = theme === 'Claro' ? 'primary' : 'error';
+
 
     useEffect(() => {
         MensagemService.findAll().then(
@@ -35,9 +39,9 @@ const Mensagem = () => {
                     logo={logo}
                 />
 
-                <section className="p-2 m-2 shadow-lg">
+                <section className="p-2 m-2">
                     <Box m={2} display="flex" alignItems="center">
-                        <Button variant="contained" color="info" sx={{ position: 'relative' }}>
+                        <Button variant="contained" sx={{ position: 'relative', color: 'white', backgroundColor: 'black', }}>
                             Total de Mensagens
                             <Badge
                                 badgeContent={mensagens.length}
@@ -52,14 +56,14 @@ const Mensagem = () => {
                         </Button>
 
                         <Link to={'/mensagemlista'} style={{ textDecoration: 'none' }}>
-                            <Button variant="contained" color="success" sx={{ ml: 2 }}>
+                            <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
                                 Lista
                             </Button>
                         </Link>
 
                         {/* 👇 Botão para alternar exibição de inativas */}
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             color="secondary"
                             onClick={() => setMostrarInativas(!mostrarInativas)}
                             sx={{ ml: 2 }}

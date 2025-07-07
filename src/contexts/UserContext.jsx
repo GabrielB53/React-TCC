@@ -5,31 +5,29 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Carrega o usuário do sessionStorage ao montar o provider
   useEffect(() => {
     try {
-      const storedUser = sessionStorage.getItem("user");
+      const storedUser = localStorage.getItem("user");
       if (storedUser) {
         setCurrentUser(JSON.parse(storedUser));
       }
     } catch (error) {
-      console.error("Erro ao carregar o usuário do sessionStorage:", error);
+      console.error("Erro ao carregar o usuário do localStorage:", error);
       setCurrentUser(null);
     }
   }, []);
 
-  // Salva o usuário no sessionStorage sempre que mudar
   useEffect(() => {
     if (currentUser) {
-      sessionStorage.setItem("user", JSON.stringify(currentUser));
+      localStorage.setItem("user", JSON.stringify(currentUser));
     } else {
-      sessionStorage.removeItem("user");
+      localStorage.removeItem("user");
     }
   }, [currentUser]);
 
   const clearUser = () => {
     setCurrentUser(null);
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
   };
 
   return (

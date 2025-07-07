@@ -14,7 +14,6 @@ html {
   -moz-osx-font-smoothing: grayscale;
   box-sizing: border-box;
 }
-
 .table-wrapper {
   max-height: 69vh;
   overflow-y: auto;
@@ -68,6 +67,11 @@ body {
   color: white;
 }
 
+.caixota{
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 4px;
+}
 .dark-theme .caixota {
   background-color: rgba(0, 0, 0, 0.452);
 }

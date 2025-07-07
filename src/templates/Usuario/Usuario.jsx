@@ -14,9 +14,6 @@ const Usuario = () => {
     const listaUser = () => {
         navigate('/usuarioslista');  
     };
-    const deletarUser = () => {
-        navigate('/usuariodeletar');  
-    };
     return (
         <div className="d-flex">
            <Sidebar />
@@ -31,7 +28,6 @@ const Usuario = () => {
                     <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
                     <Button onClick={novoUser}>Novo Usuário</Button>
                     <Button onClick={listaUser}>Lista de Usuários</Button>
-                    <Button onClick={deletarUser}>Deletar Usuário</Button>
                     </ButtonGroup>
                     </div>
                 </section>

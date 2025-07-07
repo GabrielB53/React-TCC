@@ -63,6 +63,10 @@ const reativar = (id) => {
     return http.multipartInstance.put(API_URL + `reativar/${id}`);
 };
 
+const resetarSenha = (id) => {
+    return http.multipartInstance.put(API_URL + `resetarSenha/${id}`);
+};
+
 const alterarSenha = (id, data) => {
     const formData = new FormData();
     formData.append('senha', data.senha);
@@ -70,13 +74,14 @@ const alterarSenha = (id, data) => {
     return http.mainInstance.put(API_URL + `alterarSenha/${id}`, formData);
 };
 
-const findByNome = nome => {
+const findByNome = (nome) => {
     return http.mainInstance.get(API_URL + `findByNome?nome=${nome}`);
 };
 
 const setCurrentUser = (usuario) => {
     localStorage.setItem("user", JSON.stringify(usuario));
 };
+
 
 const UsuarioService = {
     setCurrentUser,
@@ -91,6 +96,7 @@ const UsuarioService = {
     updateProfile,
     inativar,
     reativar,
+    resetarSenha,
     alterarSenha,
     findByNome,
 }

@@ -18,7 +18,6 @@ import AddCardapio from "../templates/Cardapio/AddCardapio"
 import AlterarCardapio from "../templates/Cardapio/AlterarCardapio"
 import DeletarCardapio from "../templates/Cardapio/DeletarCardapio"
 import Cardapio from "../templates/Cardapio/Cardapio"
-import UsuarioDeletar from "../templates/Usuario/UsuarioDeletar"
 import { ThemeProvider } from "../contexts/ThemeContext"
 import CardapioLista from "../templates/Cardapio/CardapioLista"
 import MensagemLista from "../templates/Mensagem/MensagemLista"
@@ -52,7 +51,6 @@ const AppRoutes = () => {
         <Route path="/usuarioslista" element={<RotaProtegida><UsuariosLista /></RotaProtegida>} />
         <Route path="/usuarionovo" element={<RotaProtegida><UsuarioNovo /></RotaProtegida>} />
         <Route path="/usuarioeditar/:id" element={<RotaProtegida><UsuarioEditar /></RotaProtegida>} />
-        <Route path="/usuariodeletar" element={<RotaProtegida><UsuarioDeletar /></RotaProtegida>} />
         
         <Route path="/grafico" element={<RotaProtegida><Grafico /></RotaProtegida>} />
         
