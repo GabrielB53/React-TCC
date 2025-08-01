@@ -13,7 +13,7 @@ const Cardapio = () => {
         navigate('/addcardapio');  
     };
     const alterarCardapio = () => {
-        navigate('/cardapio-lista');  
+        navigate('/cardapiolista');  
     };
     const deletarCardapio = () =>{
         navigate('/deletarcardapio')

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/Menu/Sidebar';
 import Header from '../../components/Header/Header';
-import { Alert, Button, Badge, Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { Alert, Button, Badge, Box } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import logo from '../../assets/images/home.png';
 import { ThemeContext } from "../../contexts/ThemeContext";
@@ -68,7 +68,7 @@ const CardapioLista = () => {
         if (data.length === 0) {
           setAlerta({ show: true, message: 'Nenhum cardápio encontrado!', type: 'warning' });
         } else {
-          setAlerta({ show: true, message: 'Cardápio(s) encontrado(s) com sucesso.', type: 'success' });
+          setAlerta({ show: true, message: 'Usuário(s) encontrado(s) com sucesso.', type: 'success' });
         }
         setCardapios(data);
         setPage(0);
@@ -101,6 +101,7 @@ const CardapioLista = () => {
     for (let i = 1; i <= pages; i++) {
       items.push(
         <li className="page-item" key={i}>
+          {/* Corrigido: converte valor para número */}
           <button
             className="page-link"
             type="button"
@@ -136,70 +137,6 @@ const CardapioLista = () => {
           </li>
         </ul>
       </nav>
-    );
-  };
-
-  // Função que renderiza os cards no lugar da tabela
-  const renderCards = () => {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 2,
-          justifyContent: 'flex-start',
-          mt: 3,
-        }}
-      >
-        {(rowsPerPage > 0
-          ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          : cardapios
-        )
-          .filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO')
-          .map((cardapio, index) => {
-            const globalIndex = page * rowsPerPage + index + 1; // enumeração global
-            const dataFormatada = cardapio.diaServido
-              ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
-              : '';
-
-            // Ajuste a imagem conforme sua necessidade:
-            let imagemSrc = '/static/images/cards/contemplative-reptile.jpg'; // fallback
-            if (cardapio.foto) {
-              imagemSrc = `data:image/jpeg;base64,${cardapio.foto}`;
-            }
-
-            return (
-              <Card key={cardapio.id} sx={{ width: 300 }}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={imagemSrc}
-                  alt={`Imagem do cardápio ${cardapio.nome}`}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {globalIndex}. {cardapio.nome}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Prato ID: {cardapio.pratoId} <br />
-                    Dia Servido: {dataFormatada || cardapio.diaServido} <br />
-                    Status: {cardapio.statusCardapio}
-                  </Typography>
-                </CardContent>
-                <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    size="small"
-                    onClick={() => lerCardapio(cardapio.id)}
-                  >
-                    Abrir
-                  </Button>
-                </Box>
-              </Card>
-            );
-          })}
-      </Box>
     );
   };
 
@@ -271,30 +208,72 @@ const CardapioLista = () => {
             </Button>
           </Box>
 
-          {/* Cards em vez de tabela */}
-          {renderCards()}
-
-          <hr />
-          <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
-            <div className="fw-bold">Quantidade de Registros: {cardapios.length}</div>
-            <div className="d-flex align-items-center">
-              <label htmlFor="itensPorPagina" className="me-2 fw-bold">
-                Registros por página:
-              </label>
-              <select
-                id="itensPorPagina"
-                className="form-select me-2"
-                value={rowsPerPage}
-                onChange={handleChangeRowsPerPage}
-                style={{ width: '70px' }}
-              >
-                {recordsPerPage.map((r) => (
-                  <option value={r} key={r}>
-                    {r}
-                  </option>
-                ))}
-              </select>
-              <div>{listItems()}</div>
+          <div className="table-responsive">
+            <table className="table table-striped table-hover table-bordered shadow">
+              <thead className="table text-center">
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Prato ID</th>
+                  <th>Dia Servido</th>
+                  <th>Status</th>
+                  <th>Abrir</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(rowsPerPage > 0
+                  ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : cardapios
+                )
+                  .filter((c) => mostrarInativas || c.statusCardapio !== 'INATIVO')
+                  .map((cardapio) => {
+                    const dataFormatada = cardapio.diaServido
+                      ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
+                      : '';
+                    return (
+                      <tr key={cardapio.id}>
+                        <td className="text-center">{cardapio.id}</td>
+                        <td>{cardapio.nome}</td>
+                        <td>{cardapio.pratoId}</td>
+                        <td>{dataFormatada || cardapio.diaServido}</td>
+                        <td className="text-center">{cardapio.statusCardapio}</td>
+                        <td className="text-center">
+                          <Button
+                            variant="contained"
+                            color="warning"
+                            size="small"
+                            onClick={() => lerCardapio(cardapio.id)}
+                          >
+                            <i className="bi bi-person-fill-gear me-2"></i>Abrir
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+            <hr />
+            <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
+              <div className="fw-bold">Quantidade de Registros: {cardapios.length}</div>
+              <div className="d-flex align-items-center">
+                <label htmlFor="itensPorPagina" className="me-2 fw-bold">
+                  Registros por página:
+                </label>
+                <select
+                  id="itensPorPagina"
+                  className="form-select me-2"
+                  value={rowsPerPage}
+                  onChange={handleChangeRowsPerPage}
+                  style={{ width: '70px' }}
+                >
+                  {recordsPerPage.map((r) => (
+                    <option value={r} key={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+                <div>{listItems()}</div>
+              </div>
             </div>
           </div>
         </section>

@@ -1,0 +1,57 @@
+import http from '../common/http-common';
+
+const API_URL = "cardapio/";
+
+const findAll = () => {
+    return http.mainInstance.get(API_URL + 'findAll');
+};
+
+const findById = (id) => {
+    return http.mainInstance.get(API_URL + `findById/${id}`);
+};
+const create = (data) => {
+    const formData = new FormData();
+
+    // Anexa o JSON com content-type application/json
+    formData.append('cardapio', new Blob([JSON.stringify({
+        nome: data.nome,
+        diaServido: data.diaServido,
+        pratoId: data.pratoId,
+        statusCardapio: data.statusCardapio
+    })], { type: 'application/json' }));
+
+    if (data.fotoFile) {
+        formData.append('file', data.fotoFile);
+    }
+
+    // NÃO definir o Content-Type no header, deixa o axios definir
+    return http.mainInstance.post(API_URL + "create", formData);
+};
+
+const editar = (id, data) => {
+    return http.mainInstance.put(API_URL + `editar/${id}`, data);
+};
+
+const inativar = (id) => {
+    return http.mainInstance.put(API_URL + `inativar/${id}`);
+};
+
+const reativar = (id) => {
+    return http.mainInstance.put(API_URL + `reativar/${id}`);
+};
+
+const findByNome = (nome) => {
+    return http.mainInstance.get(API_URL + `findByNome?nome=${nome}`);
+};
+
+const CardapioService = {
+    findAll,
+    findById,
+    create,
+    editar,
+    inativar,
+    reativar,
+    findByNome
+};
+
+export default CardapioService;

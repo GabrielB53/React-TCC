@@ -58,7 +58,7 @@ const AppRoutes = () => {
         <Route path="/alterarcardapio" element={<RotaProtegida><AlterarCardapio /></RotaProtegida>} />
         <Route path="/deletarcardapio" element={<RotaProtegida><DeletarCardapio /></RotaProtegida>} />
         <Route path="/cardapio" element={<RotaProtegida><Cardapio /></RotaProtegida>} />
-        <Route path="/cardapio-lista" element={<RotaProtegida><CardapioLista/></RotaProtegida>}/>
+        <Route path="/cardapiolista" element={<RotaProtegida><CardapioLista/></RotaProtegida>}/>
       </Routes>
      
     </div>
