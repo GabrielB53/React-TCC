@@ -1,83 +1,269 @@
-import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header/Header";
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/Menu/Sidebar';
+import Header from '../../components/Header/Header';
+import CardapioService from '../../services/CardService';
+import { Alert, Button, Badge, Box } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import logo from '../../assets/images/home.png';
-import axios from 'axios';
-import { useEffect, useState } from "react";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const CardapioLista = () => {
-    
-    const [dados, setDados] = useState([])
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { theme } = useContext(ThemeContext);
 
-    function receberDados(){
-        axios.get('http://localhost:8080/cardapio'
-        ).then(response => {
-            console.log(response.data)
-            setDados(response.data)
-        })
-        .catch(error => console.log(error))
+  const recordsPerPage = [6, 8, 10];
+  const [cardapios, setCardapios] = useState([]);
+  const [mostrarInativas, setMostrarInativas] = useState(false);
+  const [search, setSearch] = useState('');
+  const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
+
+  // Paginação
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(recordsPerPage[0]);
+  const [pages, setPages] = useState(0);
+
+  const buttonColor = theme === 'Claro' ? 'primary' : 'error';
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const onSearchSubmit = (e) => {
+    e.preventDefault();
+    findByNome();
+  };
+
+  const findAll = () => {
+    UsuarioService.findAll()
+      .then((response) => {
+        const data = response.data || [];
+        setCardapios(data);
+        setPage(0);
+        setPages(Math.ceil(data.length / rowsPerPage));
+        setAlerta({ show: false, message: '', type: '' });
+      })
+      .catch(() => {
+        setCardapios([]);
+        setAlerta({ show: true, message: 'Erro ao carregar cardápios.', type: 'error' });
+      });
+  };
+
+  const findByNome = () => {
+    const trimmedNome = search.trim();
+
+    if (!trimmedNome) {
+      findAll();
+      return;
     }
-    useEffect(()=>{
-        receberDados()
-    }, [])
 
+    UsuarioService.findByNome(trimmedNome)
+      .then((response) => {
+        const data = Array.isArray(response.data) ? response.data : [response.data];
+        if (data.length === 0) {
+          setAlerta({ show: true, message: 'Nenhum cardápio encontrado!', type: 'warning' });
+        } else {
+          setAlerta({ show: true, message: 'Usuário(s) encontrado(s) com sucesso.', type: 'success' });
+        }
+        setCardapios(data);
+        setPage(0);
+        setPages(Math.ceil(data.length / rowsPerPage));
+      })
+      .catch(() => {
+        setCardapios([]);
+        setAlerta({ show: true, message: 'Erro ao buscar cardápios.', type: 'error' });
+      });
+  };
 
+  useEffect(() => {
+    findAll();
+  }, []);
 
+  useEffect(() => {
+    setPages(Math.ceil(cardapios.length / rowsPerPage));
+    if (page > pages - 1) {
+      setPage(0);
+    }
+  }, [rowsPerPage, cardapios]);
 
-    const ItensTable = () => dados.map(
-        cardapio => (
-            <tr key={cardapio.id}>
-                <td>{cardapio.id}</td>
-                <td>{cardapio.nome}</td>
-                <td>{cardapio.dataCardapio}</td>
-                <td>{cardapio.principal}</td>
-                <td>{cardapio.acompanhamento}</td>
-                <td>{cardapio.adicional}</td>
-                <td>
-                    <button
-                        className="btn btn-danger"
-                        onClick={() => navigate('/alterarcardapio', { state: { cardapio } })}
-                    >
-                        Alterar
-                    </button>
-                </td>
-            </tr>
-        )
-    );
+  const lerUsuario = (id) => {
+    navigate(`/cardapioditar/${id}`);
+  };
 
+  const listItems = () => {
+    let items = [];
+    for (let i = 1; i <= pages; i++) {
+      items.push(
+        <li className="page-item" key={i}>
+          <button className="page-link" type="button" value={i} onClick={(e) => setPage(e.target.value - 1)}>
+            {i}
+          </button>
+        </li>
+      );
+    }
     return (
-        <div className="d-flex">
-            <Sidebar />
-            <div className="p-3 w-100">
-                <Header
-                    goto={'/cardapio'}
-                    title={'Lista de Cardápios'}
-                    logo={logo}
-                />
-                <section className="m-2 p-2 shadow-lg">
-                    <div className="table-wrapper">
-                        <table className="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Data</th>
-                                    <th scope="col">Principal</th>
-                                    <th scope="col">Acompanhamento</th>
-                                    <th scope="col">Adicional</th>
-                                    <th scope="col">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <ItensTable />
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </div>
+      <nav aria-label="Page navigation example">
+        <ul className="pagination pt-3">
+          <li className="page-item">
+            <button className="page-link" type="button" onClick={() => setPage(p => (p > 0 ? p - 1 : p))}>
+              &laquo;
+            </button>
+          </li>
+          {items}
+          <li className="page-item">
+            <button className="page-link" type="button" onClick={() => setPage(p => (p < pages - 1 ? p + 1 : p))}>
+              &raquo;
+            </button>
+          </li>
+        </ul>
+      </nav>
     );
+  };
+
+  return (
+    <div className="d-flex">
+      <Sidebar />
+      <div className="p-3 w-100">
+        <Header goto={'/cardapio'} title={'Lista de cardápios'} logo={logo} />
+
+        <section className="p-2 m-2 shadow-lg">
+          <form className=" m-2 row" onSubmit={onSearchSubmit}>
+            <label htmlFor="inputSearch" className="col-lg-3 col-form-label fs-9 ">
+              Pesquise por nome:
+            </label>
+            <div className="col-lg-7">
+              <input
+                type="text"
+                className="form-control fs-9"
+                id="inputSearch"
+                placeholder="Pesquise aqui..."
+                value={search}
+                onChange={handleSearchChange}
+              />
+            </div>
+            <div className="col-lg-1 d-flex flex-row-reverse">
+              <button type="submit" className="btn btn-primary">
+                <i className="bi bi-search fs-6"></i>
+              </button>
+            </div>
+          </form>
+
+          {alerta.show && (
+            <Alert
+              icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+              severity={alerta.type}
+              onClose={() => setAlerta({ show: false, message: '', type: '' })}
+              className="mb-3"
+            >
+              {alerta.message}
+            </Alert>
+          )}
+
+          <Box m={2} display="flex" alignItems="center">
+            <Button variant="contained" sx={{ position: 'relative', color: 'white', backgroundColor: 'black' }}>
+              Total de Cardapios
+              <Badge
+                badgeContent={cardapios.length}
+                color="error"
+                sx={{ position: 'absolute', top: -1, right: -1, transform: 'translate(50%, -50%)' }}
+              />
+            </Button>
+
+            <Link to={'/usersearch'} style={{ textDecoration: 'none' }}>
+              <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
+                Lista
+              </Button>
+            </Link>
+
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setMostrarInativas(!mostrarInativas)}
+              sx={{ ml: 2 }}
+            >
+              {mostrarInativas ? 'Ocultar Inativas' : 'Mostrar Inativas'}
+            </Button>
+          </Box>
+
+          <div className="table-responsive">
+            <table className="table table-striped table-hover table-bordered shadow">
+              <thead className="table text-center">
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Acesso</th>
+                  <th>Data</th>
+                  <th>Status</th>
+                  <th>Abrir</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(rowsPerPage > 0
+                  ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : cardapios
+                )
+                  .filter((u) => mostrarInativas || u.statusUsuario !== 'INATIVO')
+                  .map((cardapio) => {
+                    const dataFormatada = new Date(cardapio.dataCadastro).toLocaleDateString('pt-BR');
+                    return (
+                      <tr key={cardapio.id}>
+                        <td className="text-center">{cardapio.id}</td>
+                        <td>{cardapio.nome}</td>
+                        <td>{cardapio.email}</td>
+                        <td>{cardapio.nivelAcesso}</td>
+                        <td>{dataFormatada}</td>
+                        <td className="text-center">{cardapio.statusUsuario}</td>
+                        <td className="text-center">
+                          <Button
+                            variant="contained"
+                            color="warning"
+                            size="small"
+                            onClick={() => lerUsuario(cardapio.id)}
+                          >
+                            <i className="bi bi-person-fill-gear me-2"></i>Abrir
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+            <hr />
+            <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
+              <div className="fw-bold">
+                Quantidade de Registros: {cardapios.length}
+              </div>
+              <div className="d-flex align-items-center">
+                <label htmlFor="itensPorPagina" className="me-2 fw-bold">
+                  Registros por página:
+                </label>
+                <select
+                  id="itensPorPagina"
+                  className="form-select me-2"
+                  value={rowsPerPage}
+                  onChange={handleChangeRowsPerPage}
+                  style={{ width: '70px' }}
+                >
+                  {recordsPerPage.map((r) => (
+                    <option value={r} key={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+                <div>{listItems()}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 };
 
 export default CardapioLista;
