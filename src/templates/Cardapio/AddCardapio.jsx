@@ -49,12 +49,16 @@ const AddCardapio = () => {
         }
 
         const data = new FormData();
-        data.append('nome', formData.nome);
-        data.append('pratoId', parseInt(formData.pratoId)); // conversão para número
-        data.append('diaServido', formData.diaServido);
-        data.append('statusCardapio', formData.statusCardapio);
+        const cardapioJson = JSON.stringify({
+            nome: formData.nome,
+            pratoId: parseInt(formData.pratoId),
+            diaServido: formData.diaServido,
+            statusCardapio: formData.statusCardapio
+        });
+        data.append('cardapio', cardapioJson);
+
         if (formData.fotoFile) {
-            data.append('foto', formData.fotoFile);
+            data.append('file', formData.fotoFile);
         }
 
         CardapioService.create(data).then(

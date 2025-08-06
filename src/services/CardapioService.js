@@ -12,21 +12,22 @@ const findById = (id) => {
 const create = (data) => {
     const formData = new FormData();
 
-    // Anexa o JSON com content-type application/json
-    formData.append('cardapio', new Blob([JSON.stringify({
+    const cardapioPayload = {
         nome: data.nome,
         diaServido: data.diaServido,
         pratoId: data.pratoId,
         statusCardapio: data.statusCardapio
-    })], { type: 'application/json' }));
+    };
+
+    formData.append('cardapio', JSON.stringify(cardapioPayload));
 
     if (data.fotoFile) {
         formData.append('file', data.fotoFile);
     }
 
-    // NÃO definir o Content-Type no header, deixa o axios definir
-    return http.mainInstance.post(API_URL + "create", formData);
+    return http.mainInstance.post("http://localhost:8080/cardapio/create", formData);
 };
+
 
 const editar = (id, data) => {
     return http.mainInstance.put(API_URL + `editar/${id}`, data);
