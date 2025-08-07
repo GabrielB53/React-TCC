@@ -10,17 +10,6 @@ const findById = (id) => {
     return http.mainInstance.get(API_URL + `findById/${id}`);
 };
 
-const create = data => {
-    const formData = new FormData();
-    formData.append('nome', data.nome);
-
-    return http.mainInstance.post(API_URL + "create", formData);
-};
-
-const update = (id, data) => {
-    return http.multipartInstance.put(API_URL + `editar/${id}`, data);
-};
-
 
 const inativar = (id) => {
     return http.multipartInstance.put(API_URL + `inativar/${id}`);
@@ -37,8 +26,6 @@ const findByNome = (nome) => {
 const UsuarioService = {
     findAll,
     findById,
-    create,
-    update,
     inativar,
     reativar,
     findByNome,

@@ -9,25 +9,25 @@ const findAll = () => {
 const findById = (id) => {
     return http.mainInstance.get(API_URL + `findById/${id}`);
 };
+
 const create = (data) => {
     const formData = new FormData();
 
     const cardapioPayload = {
         nome: data.nome,
         diaServido: data.diaServido,
-        pratoId: data.pratoId,
+        pratoId: Number(data.pratoId),
         statusCardapio: data.statusCardapio
     };
-
+    
     formData.append('cardapio', JSON.stringify(cardapioPayload));
 
     if (data.fotoFile) {
         formData.append('file', data.fotoFile);
     }
 
-    return http.mainInstance.post("http://localhost:8080/cardapio/create", formData);
+    return http.multipartInstance.post("cardapio/create", formData);
 };
-
 
 const editar = (id, data) => {
     return http.mainInstance.put(API_URL + `editar/${id}`, data);

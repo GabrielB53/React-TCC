@@ -42,36 +42,26 @@ const AddCardapio = () => {
         e.preventDefault();
         setSuccessful(false);
 
-        // Validação básica
         if (!formData.pratoId || isNaN(formData.pratoId)) {
             setMessage("Por favor, informe um ID de prato válido.");
             return;
         }
 
-        const data = new FormData();
-        const cardapioJson = JSON.stringify({
+        CardapioService.create({
             nome: formData.nome,
-            pratoId: parseInt(formData.pratoId),
+            pratoId: formData.pratoId,
             diaServido: formData.diaServido,
-            statusCardapio: formData.statusCardapio
+            statusCardapio: formData.statusCardapio,
+            fotoFile: formData.fotoFile,
+        }).then(() => {
+            setMessage("Cardápio criado com sucesso!");
+            setSuccessful(true);
+        }).catch((error) => {
+            const msg = error.response?.data?.message || "Erro ao criar cardápio.";
+            setMessage(msg);
         });
-        data.append('cardapio', cardapioJson);
-
-        if (formData.fotoFile) {
-            data.append('file', formData.fotoFile);
-        }
-
-        CardapioService.create(data).then(
-            (response) => {
-                setMessage("Cardápio criado com sucesso!");
-                setSuccessful(true);
-            },
-            (error) => {
-                const message = error.response?.data?.message || "Erro ao criar cardápio.";
-                setMessage(message);
-            }
-        );
     };
+
 
     return (
         <div className="d-flex">
