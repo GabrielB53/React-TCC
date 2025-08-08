@@ -42,11 +42,14 @@ const CardapioLista = () => {
   const findAll = () => {
     CardapioService.findAll()
       .then((response) => {
-        const data = response.data || [];
+        // Filtra só cardápios com id válido
+        const data = (response.data || []).filter(item => item && item.id != null);
+        console.log('Dados recebidos:', response.data);
         setCardapios(data);
         setPage(0);
         setPages(Math.ceil(data.length / rowsPerPage));
         setAlerta({ show: false, message: '', type: '' });
+        
       })
       .catch(() => {
         setCardapios([]);
@@ -64,7 +67,12 @@ const CardapioLista = () => {
 
     CardapioService.findByNome(trimmedNome)
       .then((response) => {
-        const data = Array.isArray(response.data) ? response.data : [response.data];
+        let data = [];
+        if (Array.isArray(response.data)) {
+          data = response.data.filter(item => item && item.id != null);
+        } else if (response.data && response.data.id != null) {
+          data = [response.data];
+        }
         if (data.length === 0) {
           setAlerta({ show: true, message: 'Nenhum cardápio encontrado!', type: 'warning' });
         } else {
@@ -139,8 +147,15 @@ const CardapioLista = () => {
     );
   };
 
-  // Função que renderiza os cards no lugar da tabela
   const renderCards = () => {
+    // Itens filtrados conforme paginação e status
+    const itensFiltrados = (rowsPerPage > 0
+      ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      : cardapios
+    )
+      .filter(c => c && c.id != null) // só com id válido
+      .filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO');
+
     return (
       <Box
         sx={{
@@ -151,54 +166,51 @@ const CardapioLista = () => {
           mt: 3,
         }}
       >
-        {(rowsPerPage > 0
-          ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          : cardapios
-        )
-          .filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO')
-          .map((cardapio, index) => {
-            const globalIndex = page * rowsPerPage + index + 1; // enumeração global
-            const dataFormatada = cardapio.diaServido
-              ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
-              : '';
+        {itensFiltrados.map((cardapio, index) => {
+          const globalIndex = page * rowsPerPage + index + 1;
+          const dataFormatada = cardapio.diaServido
+            ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
+            : '';
 
-            // Ajuste a imagem conforme sua necessidade:
-            let imagemSrc = '/static/images/cards/contemplative-reptile.jpg'; // fallback
-            if (cardapio.foto) {
-              imagemSrc = `data:image/jpeg;base64,${cardapio.foto}`;
-            }
+          let imagemSrc = '/static/images/cards/contemplative-reptile.jpg';
+          if (cardapio.foto) {
+            imagemSrc = `data:image/jpeg;base64,${cardapio.foto}`;
+          }
 
-            return (
-              <Card key={cardapio.id} sx={{ width: 300 }}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={imagemSrc}
-                  alt={`Imagem do cardápio ${cardapio.nome}`}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h6" component="div">
-                    {globalIndex}. {cardapio.nome}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Prato ID: {cardapio.pratoId} <br />
-                    Dia Servido: {dataFormatada || cardapio.diaServido} <br />
-                    Status: {cardapio.statusCardapio}
-                  </Typography>
-                </CardContent>
-                <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    size="small"
-                    onClick={() => lerCardapio(cardapio.id)}
-                  >
-                    Abrir
-                  </Button>
-                </Box>
-              </Card>
-            );
-          })}
+          // Use cardapio.id como key, e fallback para evitar erros
+          const key = cardapio.id ?? `fallback-${page * rowsPerPage + index}`;
+
+          return (
+            <Card key={key} sx={{ width: 300 }}>
+              <CardMedia
+                component="img"
+                height="140"
+                image={imagemSrc}
+                alt={`Imagem do cardápio ${cardapio.nome}`}
+              />
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  {globalIndex}. {cardapio.nome}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Prato ID: {cardapio.pratoId} <br />
+                  Dia Servido: {dataFormatada || cardapio.diaServido} <br />
+                  Status: {cardapio.statusCardapio}
+                </Typography>
+              </CardContent>
+              <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  size="small"
+                  onClick={() => lerCardapio(cardapio.id)}
+                >
+                  Abrir
+                </Button>
+              </Box>
+            </Card>
+          );
+        })}
       </Box>
     );
   };
@@ -247,7 +259,7 @@ const CardapioLista = () => {
               variant="contained"
               sx={{ position: 'relative', color: 'white', backgroundColor: 'black' }}
             >
-              Total de Cardapios
+              Total de Cardápios
               <Badge
                 badgeContent={cardapios.length}
                 color="error"
