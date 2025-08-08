@@ -12,7 +12,7 @@ const CardapioLista = () => {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
 
-  const recordsPerPage = [6, 8, 10];
+  const recordsPerPage = [3, 5, 10];
   const [cardapios, setCardapios] = useState([]);
   const [mostrarInativas, setMostrarInativas] = useState(false);
   const [search, setSearch] = useState('');
