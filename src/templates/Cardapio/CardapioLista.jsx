@@ -101,7 +101,7 @@ const CardapioLista = () => {
   }, [rowsPerPage, cardapios, page]);
 
   const lerCardapio = (id) => {
-    navigate(`/cardapioditar/${id}`);
+    navigate(`/alterarcardapio/${id}`);
   };
 
   const listItems = () => {
@@ -176,8 +176,6 @@ const CardapioLista = () => {
           if (cardapio.foto) {
             imagemSrc = `data:image/jpeg;base64,${cardapio.foto}`;
           }
-
-          // Use cardapio.id como key, e fallback para evitar erros
           const key = cardapio.id ?? `fallback-${page * rowsPerPage + index}`;
 
           return (

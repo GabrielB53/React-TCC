@@ -42,7 +42,7 @@ const Mensagem = () => {
                 <section className="p-2 m-2">
                     <Box m={2} display="flex" alignItems="center">
                         <Button variant="contained" sx={{ position: 'relative', color: 'white', backgroundColor: 'black', }}>
-                            Total de Mensagens
+                            Total
                             <Badge
                                 badgeContent={mensagens.length}
                                 color="error"
@@ -70,6 +70,12 @@ const Mensagem = () => {
                         >
                             {mostrarInativas ? 'Ocultar Inativas' : 'Mostrar Inativas'}
                         </Button>
+
+                        <Link to={'/sendmessage'} style={{ textDecoration: 'none' }}>
+                            <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
+                                Enviar mensagem
+                            </Button>
+                        </Link>
                     </Box>
 
                     <div className="table-wrapper">

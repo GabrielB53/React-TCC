@@ -1,41 +1,78 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
-import Sidebar from '../../components/Menu/Sidebar';
-import logo from '../../assets/images/home.png';
-import { Formik } from "formik";
-import * as Yup from 'yup';
-import axios from "axios";
-import Alert from '@mui/material/Alert';
+import Sidebar from "../../components/Menu/Sidebar";
+import logo from "../../assets/images/home.png";
+import CardapioService from "../../services/CardapioService";
+import { Alert, Button, TextField, Grid, Paper, Box, ButtonGroup } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const AlterarCardapio = () => {
-    const { state } = useLocation(); // Pega os dados do cardápio via location state
-    const cardapio = state.cardapio; // Extrai o cardápio do state
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
+    const { theme } = useContext(ThemeContext);
 
-    const validationSchema = Yup.object().shape({
-        nome: Yup.string().required('Nome é obrigatório'),
-        dataCardapio: Yup.string().required('Data é obrigatória'),
-        principal: Yup.string().required('É necessário preencher!'),
-        acompanhamento: Yup.string().required('É necessário preencher!'),
-        adicional: Yup.string().required('É necessário preencher!')
+    const [cardapio, setCardapio] = useState({
+        id: null,
+        nome: "",
+        diaServido: "",
     });
 
-    const handleFormSubmit = (values) => {
-        axios.put(`http://localhost:8080/cardapio/${cardapio.id}`, values)
-            .then(response => {
-                setAlerta({ show: true, message: 'Cardápio atualizado com sucesso!', type: 'success' });
-                setTimeout(() => {
-                    navigate('/cardapio-lista');
-                }, 2000);
+    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
+
+    useEffect(() => {
+        CardapioService.findById(id)
+            .then((response) => {
+                setCardapio(response.data);
             })
-            .catch(error => {
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao buscar cardápio.', type: 'error' });
+            });
+    }, [id]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCardapio(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        CardapioService.update(id, cardapio)
+            .then(() => {
+                setAlerta({ show: true, message: 'cardápio atualizado com sucesso!', type: 'success' });
+                setTimeout(() => navigate('/cardapiolista'), 1000);
+            })
+            .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao atualizar cardápio.', type: 'error' });
             });
     };
+
+    const inativar = () => {
+        CardapioService.inativar(id)
+            .then(() => {
+                setAlerta({ show: true, message: 'Carrdápio inativado com sucesso!', type: 'success' });
+                setTimeout(() => navigate('/cardapiolista'), 1000);
+            })
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao inativar cardápio.', type: 'error' });
+            });
+    };
+
+    const reativar = () => {
+        CardapioService.reativar(id)
+            .then(() => {
+                setAlerta({ show: true, message: 'Cardápio reativado com sucesso!', type: 'success' });
+                setTimeout(() => navigate('/cardapioslista'), 2000);
+            })
+            .catch(() => {
+                setAlerta({ show: true, message: 'Erro ao reativar cardápio.', type: 'error' });
+            });
+    };
+
+    const textColor = theme === 'Claro' ? '' : 'white';
+    const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
+    const paperBackground = theme === 'Claro' ? 'rgba(255, 255, 255)' : 'rgba(0, 0, 0, 0.0)'
 
     return (
         <div className="d-flex">
@@ -46,7 +83,8 @@ const AlterarCardapio = () => {
                     title={'Editar Cardápio'}
                     logo={logo}
                 />
-                <section className="m-2 p-2 shadow-lg">
+
+                <section className="m-2 p-2">
                     {alerta.show && (
                         <Alert
                             icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
@@ -62,105 +100,127 @@ const AlterarCardapio = () => {
                             {alerta.message}
                         </Alert>
                     )}
-                    <Formik
-                        initialValues={cardapio} // Usa os dados do cardápio como initialValues
-                        validationSchema={validationSchema}
-                        onSubmit={handleFormSubmit}
-                    >
-                        {props => (
-                            <form onSubmit={props.handleSubmit} className="row g-3">
-                                <div className="col-md-2">
-                                    <label htmlFor="inputID" className="form-label">ID</label>
-                                    <input type="text" className="form-control" id="inputID" readOnly
-                                        value={cardapio.id} />
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputNome" className="form-label">Nome</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="inputNome"
+
+                    <Paper sx={{ padding: 4, backgroundColor: paperBackground }}>
+                        <Box component="form" onSubmit={handleSubmit}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={2}>
+                                    <TextField
+                                        label="ID"
+                                        value={cardapio.id || ''}
+                                        fullWidth
+                                        InputProps={{ readOnly: true, style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    <TextField
+                                        label="Nome"
                                         name="nome"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.nome}
+                                        value={cardapio.nome}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                     />
-                                    {props.touched.nome && props.errors.nome && (
-                                        <div id="feedback">{props.errors.nome}</div>
-                                    )}
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputData" className="form-label">Data</label>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        id="inputData"
-                                        name="data"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.dataCardapio}
-                                    />
-                                    {props.touched.dataCardapio && props.errors.dataCardapio && (
-                                        <div id="feedback">{props.errors.dataCardapio}</div>
-                                    )}
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputPrincipal" className="form-label">Principal</label>
-                                    <input
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    <TextField
+                                        label="Dia"
+                                        name="diaServido"
                                         type="text"
-                                        className="form-control"
-                                        id="inputPrincipal"
-                                        name="principal"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.principal}
+                                        value={cardapio.diaServido}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                     />
-                                    {props.touched.principal && props.errors.principal && (
-                                        <div id="feedback">{props.errors.principal}</div>
-                                    )}
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputAcompanhamento" className="form-label">Acompanhamento</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="inputAcompanhamento"
-                                        name="acompanhamento"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.acompanhamento}
+                                </Grid>
+
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        label="Status"
+                                        value={cardapio.statusCardapio || ''}
+                                        fullWidth
+                                        InputProps={{ readOnly: true, style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                     />
-                                    {props.acompanhamento && props.errors.acompanhamento && (
-                                        <div id="feedback">{props.errors.acompanhamento}</div>
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    {/* Aqui seria o id do prato, que também n sei como fazer kk*/}
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    {cardapio.foto && (
+                                        <img
+                                            src={cardapio.foto}
+                                            alt="Imagem do Cardápio"
+                                            style={{
+                                                width: '100%',
+                                                maxHeight: '250px',
+                                                objectFit: 'cover',
+                                                borderRadius: '8px',
+                                                border: `1px solid ${textColor}`
+                                            }}
+                                        />
                                     )}
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputAdicional" className="form-label">Adicional</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="inputAdicional"
-                                        name="adicional"
-                                        onChange={props.handleChange}
-                                        onBlur={props.handleBlur}
-                                        value={props.values.adicional}
-                                    />
-                                    {props.adicional && props.errors.adicional && (
-                                        <div id="feedback">{props.errors.adicional}</div>
-                                    )}
-                                </div>
-                                <div className="col-12 d-flex justify-content-between">
-                                    <button type="submit" className="btn btn-primary">
+                                </Grid>
+
+                                <Grid item xs={12} display="flex" justifyContent="space-between">
+                                    <Button type="submit" variant="contained" color="primary">
                                         Gravar Alterações
-                                    </button>
-                                </div>
-                            </form>
-                        )}
-                    </Formik>
+                                    </Button>
+                                    <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                                        <Button onClick={reativar}>Reativar</Button>
+                                        <Button onClick={inativar}>Inativar</Button>
+                                    </ButtonGroup>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Paper>
                 </section>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default AlterarCardapio
+export default AlterarCardapio;

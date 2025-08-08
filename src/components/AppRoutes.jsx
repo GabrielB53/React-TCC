@@ -25,6 +25,7 @@ import LoginNewPass from "../templates/Login/LoginNewPass"
 import UsuarioPerfil from "../templates/Usuario/UsuarioPerfil"
 import UsuarioAlterarSenha from "../templates/Usuario/UsuarioAlterarSenha"
 import RotaProtegida from "./Acesso/RotaProtegida"
+import SendMessage from "../templates/Mensagem/SendMessage"
 
 
 const AppRoutes = () => {
@@ -43,6 +44,7 @@ const AppRoutes = () => {
         <Route path="/mensagem" element={<RotaProtegida><Mensagem /></RotaProtegida>} />
         <Route path="/mensagemler/:id" element={<RotaProtegida><MensagemLer /></RotaProtegida>} />
         <Route path="/mensagemlista" element={<RotaProtegida><MensagemLista/></RotaProtegida>} />
+        <Route path="/sendmessage" element={<RotaProtegida><SendMessage /></RotaProtegida>} />
 
 
         <Route path="/usuario" element={<RotaProtegida><Usuario /></RotaProtegida>} />
@@ -55,7 +57,7 @@ const AppRoutes = () => {
         <Route path="/grafico" element={<RotaProtegida><Grafico /></RotaProtegida>} />
         
         <Route path="/addcardapio" element={<RotaProtegida><AddCardapio /></RotaProtegida>} />
-        <Route path="/alterarcardapio" element={<RotaProtegida><AlterarCardapio /></RotaProtegida>} />
+        <Route path="/alterarcardapio/:id" element={<RotaProtegida><AlterarCardapio /></RotaProtegida>} />
         <Route path="/deletarcardapio" element={<RotaProtegida><DeletarCardapio /></RotaProtegida>} />
         <Route path="/cardapio" element={<RotaProtegida><Cardapio /></RotaProtegida>} />
         <Route path="/cardapiolista" element={<RotaProtegida><CardapioLista/></RotaProtegida>}/>
