@@ -10,35 +10,44 @@ const Cardapio = () => {
     const navigate = useNavigate();
 
     const novoCardapio = () => {
-        navigate('/addcardapio');  
+        navigate('/addcardapio');
     };
     const alterarCardapio = () => {
-        navigate('/cardapiolista');  
+        navigate('/cardapiolista');
     };
-    const deletarCardapio = () =>{
+    const deletarCardapio = () => {
         navigate('/deletarcardapio')
     };
     return (
         <div className="d-flex">
-           <Sidebar />
-           <div className="p-3 w-100">
-                <Header 
+            <Sidebar />
+            <div className="p-3 w-100">
+                <Header
                     goto={'/home'}
                     title={'Cardapio'}
                     logo={logo}
-                    />
-                    
-                    <section className="mt-2 p-2 shadow-lg caixota">
+                />
+
+                <section className="mt-2 p-2 shadow-lg caixota">
                     <div className="d-flex justify-content-around">
-                    <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                    <Button onClick={novoCardapio}>Adicionar</Button>
-                    <Button onClick={alterarCardapio}>Lista</Button>
-                    <Button onClick={deletarCardapio}>Deletar</Button>
-                    </ButtonGroup>
+                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={alterarCardapio}>Lista</Button>
+
+                        </ButtonGroup>
                     </div>
                 </section>
-                
-           </div>
+                <section className="caixota mt-2 mb-2">
+                 
+                    <div className="d-flex justify-content-between">
+                           <h3 className="pb-2">Pratos</h3>
+                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={alterarCardapio}>Lista</Button>
+                        </ButtonGroup>
+                    </div>
+                </section>
+            </div>
         </div>
     )
 }

@@ -72,6 +72,10 @@ body {
   padding: 30px;
   border-radius: 4px;
 }
+.caixota2{
+  padding: 30px;
+  border-radius: 4px;
+}
 .dark-theme .caixota {
   background-color: rgba(0, 0, 0, 0.452);
 }
