@@ -49,7 +49,7 @@ const CardapioLista = () => {
         setPage(0);
         setPages(Math.ceil(data.length / rowsPerPage));
         setAlerta({ show: false, message: '', type: '' });
-        
+
       })
       .catch(() => {
         setCardapios([]);
@@ -183,7 +183,7 @@ const CardapioLista = () => {
               <CardMedia
                 component="img"
                 height="140"
-                image={imagemSrc}
+                image={cardapio.foto ? cardapio.foto : '/static/images/cards/contemplative-reptile.jpg'}
                 alt={`Imagem do cardápio ${cardapio.nome}`}
               />
               <CardContent>
