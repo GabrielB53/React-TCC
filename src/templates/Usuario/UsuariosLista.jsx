@@ -174,7 +174,7 @@ const UsuariosLista = () => {
               />
             </Button>
 
-            <Link to={'/usersearch'} style={{ textDecoration: 'none' }}>
+            <Link style={{ textDecoration: 'none' }}>
               <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
                 Lista
               </Button>

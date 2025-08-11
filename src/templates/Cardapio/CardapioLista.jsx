@@ -2,10 +2,19 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/Menu/Sidebar';
 import Header from '../../components/Header/Header';
-import { Alert, Button, Badge, Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Badge,
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import logo from '../../assets/images/home.png';
-import { ThemeContext } from "../../contexts/ThemeContext";
+import { ThemeContext } from '../../contexts/ThemeContext';
 import CardapioService from '../../services/CardapioService';
 
 const CardapioLista = () => {
@@ -42,14 +51,10 @@ const CardapioLista = () => {
   const findAll = () => {
     CardapioService.findAll()
       .then((response) => {
-        // Filtra só cardápios com id válido
         const data = (response.data || []).filter(item => item && item.id != null);
-        console.log('Dados recebidos:', response.data);
         setCardapios(data);
         setPage(0);
-        setPages(Math.ceil(data.length / rowsPerPage));
         setAlerta({ show: false, message: '', type: '' });
-
       })
       .catch(() => {
         setCardapios([]);
@@ -73,14 +78,15 @@ const CardapioLista = () => {
         } else if (response.data && response.data.id != null) {
           data = [response.data];
         }
+
         if (data.length === 0) {
           setAlerta({ show: true, message: 'Nenhum cardápio encontrado!', type: 'warning' });
         } else {
           setAlerta({ show: true, message: 'Cardápio(s) encontrado(s) com sucesso.', type: 'success' });
         }
+
         setCardapios(data);
         setPage(0);
-        setPages(Math.ceil(data.length / rowsPerPage));
       })
       .catch(() => {
         setCardapios([]);
@@ -93,12 +99,16 @@ const CardapioLista = () => {
   }, []);
 
   useEffect(() => {
-    const totalPages = Math.ceil(cardapios.length / rowsPerPage);
+    const filtrados = cardapios
+      .filter(c => c && c.id != null)
+      .filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO');
+
+    const totalPages = Math.ceil(filtrados.length / rowsPerPage);
     setPages(totalPages);
     if (page > totalPages - 1) {
       setPage(0);
     }
-  }, [rowsPerPage, cardapios, page]);
+  }, [rowsPerPage, cardapios, page, mostrarInativas]);
 
   const lerCardapio = (id) => {
     navigate(`/alterarcardapio/${id}`);
@@ -148,13 +158,13 @@ const CardapioLista = () => {
   };
 
   const renderCards = () => {
-    // Itens filtrados conforme paginação e status
-    const itensFiltrados = (rowsPerPage > 0
-      ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      : cardapios
-    )
-      .filter(c => c && c.id != null) // só com id válido
+    const filtrados = cardapios
+      .filter(c => c && c.id != null)
       .filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO');
+
+    const paginados = rowsPerPage > 0
+      ? filtrados.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      : filtrados;
 
     return (
       <Box
@@ -166,24 +176,22 @@ const CardapioLista = () => {
           mt: 3,
         }}
       >
-        {itensFiltrados.map((cardapio, index) => {
+        {paginados.map((cardapio, index) => {
           const globalIndex = page * rowsPerPage + index + 1;
           const dataFormatada = cardapio.diaServido
             ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
             : '';
 
-          let imagemSrc = '/static/images/cards/contemplative-reptile.jpg';
-          if (cardapio.foto) {
-            imagemSrc = `data:image/jpeg;base64,${cardapio.foto}`;
-          }
-          const key = cardapio.id ?? `fallback-${page * rowsPerPage + index}`;
+          const imagemSrc = cardapio.foto?.startsWith('data:image')
+            ? cardapio.foto
+            : `data:image/jpeg;base64,${cardapio.foto}`;
 
           return (
-            <Card key={key} sx={{ width: 300 }}>
+            <Card key={cardapio.id ?? `fallback-${index}`} sx={{ width: 300 }}>
               <CardMedia
                 component="img"
                 height="140"
-                image={cardapio.foto ? cardapio.foto : '/static/images/cards/contemplative-reptile.jpg'}
+                image={imagemSrc || '/static/images/cards/contemplative-reptile.jpg'}
                 alt={`Imagem do cardápio ${cardapio.nome}`}
               />
               <CardContent>
@@ -192,7 +200,7 @@ const CardapioLista = () => {
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Prato ID: {cardapio.pratoId} <br />
-                  Dia Servido: {dataFormatada || cardapio.diaServido} <br />
+                  Dia Servido: {dataFormatada} <br />
                   Status: {cardapio.statusCardapio}
                 </Typography>
               </CardContent>
@@ -220,7 +228,7 @@ const CardapioLista = () => {
         <Header goto={'/cardapio'} title={'Lista de cardápios'} logo={logo} />
 
         <section className="p-2 m-2 shadow-lg">
-          <form className=" m-2 row" onSubmit={onSearchSubmit}>
+          <form className="m-2 row" onSubmit={onSearchSubmit}>
             <label htmlFor="inputSearch" className="col-lg-3 col-form-label fs-9 ">
               Pesquise por nome:
             </label>
@@ -259,17 +267,20 @@ const CardapioLista = () => {
             >
               Total de Cardápios
               <Badge
-                badgeContent={cardapios.length}
+                badgeContent={
+                  cardapios.filter(
+                    c => mostrarInativas || c.statusCardapio !== 'INATIVO'
+                  ).length
+                }
                 color="error"
-                sx={{ position: 'absolute', top: -1, right: -1, transform: 'translate(50%, -50%)' }}
+                sx={{
+                  position: 'absolute',
+                  top: -1,
+                  right: -1,
+                  transform: 'translate(50%, -50%)',
+                }}
               />
             </Button>
-
-            <Link to={'/usersearch'} style={{ textDecoration: 'none' }}>
-              <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
-                Lista
-              </Button>
-            </Link>
 
             <Button
               variant="contained"
@@ -281,12 +292,14 @@ const CardapioLista = () => {
             </Button>
           </Box>
 
-          {/* Cards em vez de tabela */}
           {renderCards()}
 
           <hr />
           <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
-            <div className="fw-bold">Quantidade de Registros: {cardapios.length}</div>
+            <div className="fw-bold">
+              Quantidade de Registros:{' '}
+              {cardapios.filter(c => mostrarInativas || c.statusCardapio !== 'INATIVO').length}
+            </div>
             <div className="d-flex align-items-center">
               <label htmlFor="itensPorPagina" className="me-2 fw-bold">
                 Registros por página:
@@ -314,3 +327,4 @@ const CardapioLista = () => {
 };
 
 export default CardapioLista;
+
