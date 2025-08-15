@@ -24,23 +24,39 @@ const Cardapio = () => {
             <div className="p-3 w-100">
                 <Header
                     goto={'/home'}
-                    title={'Cardapio'}
+                    title={'Gerenciamento'}
                     logo={logo}
                 />
-
-                <section className="mt-2 p-2 shadow-lg caixota">
-                    <div className="d-flex justify-content-around">
+                <section className="caixota mt-2 mb-2">
+                    <div className="d-flex justify-content-between">
+                        <h3 className="pb-2">Cardápios</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
                             <Button onClick={novoCardapio}>Adicionar</Button>
                             <Button onClick={alterarCardapio}>Lista</Button>
-
+                        </ButtonGroup>
+                    </div>
+                </section>
+                                <section className="caixota mt-2 mb-2">
+                    <div className="d-flex justify-content-between">
+                        <h3 className="pb-2">Categorias</h3>
+                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={alterarCardapio}>Lista</Button>
                         </ButtonGroup>
                     </div>
                 </section>
                 <section className="caixota mt-2 mb-2">
-                 
                     <div className="d-flex justify-content-between">
-                           <h3 className="pb-2">Pratos</h3>
+                        <h3 className="pb-2">Pratos</h3>
+                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
+                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={alterarCardapio}>Lista</Button>
+                        </ButtonGroup>
+                    </div>
+                </section>
+                <section className="caixota mt-2 mb-2">
+                    <div className="d-flex justify-content-between">
+                        <h3 className="pb-2">Produtos</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
                             <Button onClick={novoCardapio}>Adicionar</Button>
                             <Button onClick={alterarCardapio}>Lista</Button>
