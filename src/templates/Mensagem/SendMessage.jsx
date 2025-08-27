@@ -1,12 +1,21 @@
-
-import React, { useState, useEffect } from 'react';
 import MensagemService from "../../services/MensagemService"
-import logo from '../../assets/images/home.png';
-import './FaleConosco.css'
-import Sidebar from "../../components/Menu/Sidebar";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
+import Sidebar from "../../components/Menu/Sidebar";
+import logo from "../../assets/images/home.png";
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const FaleConosco = () => {
+
+    const { theme } = useContext(ThemeContext);
     const [formData, setFormData] = useState({
         emissor: "",
         email: "",
@@ -38,7 +47,11 @@ const FaleConosco = () => {
             const msg = error.response?.data?.message || "Erro ao enviar mensagem";
             setMessage(msg);
         });
+
     }
+
+    const textColor = theme === 'Claro' ? '' : 'white';
+    const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
 
 
     return (
@@ -46,64 +59,93 @@ const FaleConosco = () => {
             <Sidebar />
             <div className="p-3 w-100">
                 <Header
-                    goto={'/home'}
-                    title={'Usuário'}
+                    goto={'/mensagem'}
+                    title={'Enviar mensagem'}
                     logo={logo}
                 />
-                <div className="d-flex justify-content-center">
-                    <form className="form-fale row g-2 rounded-2 shadow" onSubmit={handleSubmit}>
-                        <p className="h3 text-center">Fale Conosco</p>
+                <section className="m-2 mt-5 p-2">
+                    <form className="form-fale row g-2 rounded-2" onSubmit={handleSubmit} autoComplete="off">
                         {!successful && (
                             <>
-                                <div className="col-md-6">
-                                    <label htmlFor="inputEmissor" className="form-label fw-bold">Emissor:</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="emissor"
-                                        value={formData.emissor}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-md-6">
-                                    <label htmlFor="inputemail" className="form-label fw-bold">email:</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-md-6">
-                                    <label htmlFor="inputtelefone" className="form-label fw-bold">telefone:</label>
-                                    <input
-                                        type="tel"
-                                        className="form-control"
-                                        name="telefone"
-                                        value={formData.telefone}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-md-6">
-                                    <label htmlFor="inputtexto" className="form-label fw-bold">texto</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        name="texto"
-                                        value={formData.texto}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                                <div className="col-12 my-2">
-                                    <button type="submit" className="btn btn-primary">
-                                        Gravar
-                                    </button>
-                                </div>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            fullWidth
+                                            label="Emissor"
+                                            value={formData.emissor || ""}
+                                            InputProps={{ readOnly: false, style: { color: textColor } }}
+                                            InputLabelProps={{ style: { color: textColor } }}
+                                            sx={{
+                                                backgroundColor: background,
+                                                borderRadius: 1,
+                                                '& .MuiOutlinedInput-root': {
+                                                    '& fieldset': { borderColor: textColor },
+                                                    '&:hover fieldset': { borderColor: textColor },
+                                                    '&.Mui-focused fieldset': { borderColor: textColor },
+                                                }
+                                            }}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Email"
+                                            value={formData.email || ""}
+                                            InputProps={{ readOnly: false, style: { color: textColor } }}
+                                            InputLabelProps={{ style: { color: textColor } }}
+                                            sx={{
+                                                backgroundColor: background,
+                                                borderRadius: 1,
+                                                '& .MuiOutlinedInput-root': {
+                                                    '& fieldset': { borderColor: textColor },
+                                                    '&:hover fieldset': { borderColor: textColor },
+                                                    '&.Mui-focused fieldset': { borderColor: textColor },
+                                                }
+                                            }}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={2}>
+                                        <TextField
+                                            fullWidth
+                                            label="Telefone"
+                                            value={formData.telefone || ""}
+                                            InputProps={{ readOnly: false, style: { color: textColor } }}
+                                            InputLabelProps={{ style: { color: textColor } }}
+                                            sx={{
+                                                backgroundColor: background,
+                                                borderRadius: 1,
+                                                '& .MuiOutlinedInput-root': {
+                                                    '& fieldset': { borderColor: textColor },
+                                                    '&:hover fieldset': { borderColor: textColor },
+                                                    '&.Mui-focused fieldset': { borderColor: textColor },
+                                                }
+                                            }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextareaAutosize
+                                            name="texto"
+                                            value={formData.texto}
+                                            onChange={handleChange}
+                                            minRows={4}
+                                            placeholder="Digite sua mensagem..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '10px',
+                                                fontSize: '16px',
+                                                borderRadius: '5px',
+                                                borderColor: textColor,
+                                                backgroundColor: background,
+                                                color: textColor
+                                            }}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <button type="submit" className="btn btn-primary">
+                                    Gravar
+                                </button>
                             </>
                         )}
                         {message && (
@@ -116,7 +158,7 @@ const FaleConosco = () => {
                             </div>
                         )}
                     </form>
-                </div>
+                </section>
             </div>
         </div>
     )

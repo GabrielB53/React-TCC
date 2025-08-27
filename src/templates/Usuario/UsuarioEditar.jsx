@@ -86,7 +86,7 @@ const UsuarioEditar = () => {
 
     const textColor = theme === 'Claro' ? '' : 'white';
     const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
-    const paperBackground = theme === 'Claro' ? 'rgba(255, 255, 255)' : 'rgba(0, 0, 0, 0.0)'
+    const paperBackground = theme === 'Claro' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.0)'
 
     return (
         <div className="d-flex">

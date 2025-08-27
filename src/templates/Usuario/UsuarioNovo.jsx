@@ -1,109 +1,120 @@
-import { Link } from "react-router-dom"
-import Header from "../../components/Header/Header"
-import Sidebar from '../../components/Menu/Sidebar'
-import logo from '../../assets/images/home.png'
-import { useState } from "react"
-import UsuarioService from "../../services/UsuarioService"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Header from "../../components/Header/Header";
+import Sidebar from '../../components/Menu/Sidebar';
+import logo from '../../assets/images/home.png';
+import UsuarioService from "../../services/UsuarioService";
+
+// Material UI components
+import {
+  Box,
+  Grid,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Alert
+} from '@mui/material';
 
 const UsuarioNovo = () => {
+  const [formData, setFormData] = useState({});
+  const [successful, setSuccessful] = useState(false);
+  const [message, setMessage] = useState();
 
-    // const [nivel, setNivel] = useState();
-    const [formData, setFormData] = useState({});
-    const [successful, setSuccessful] = useState(false);
-    const [message, setMessage] = useState();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    const handleChange = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
-        setFormData(formData => ({ ...formData, [name]: value }));
-    }
-/*
-    const onChangeType = (e) => {
-        console.log(e.target.value)
-        setNivel(e.target.value);
-    }
-*/
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSuccessful(false);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setSuccessful(false);
 
-        UsuarioService.create(formData).then(
-            (response) => {
-                setMessage(response.data.message);
-                setSuccessful(true);
-                /*window.scrollTo({
-                  top: 0,
-                  behavior: 'smooth'
-                })*/
-            }, (error) => {
-                const message = error.response.data.message;
-                setMessage(message);
-            }
-        )
-    }
+    UsuarioService.create(formData).then(
+      (response) => {
+        setMessage(response.data.message);
+        setSuccessful(true);
+      },
+      (error) => {
+        const message = error.response?.data?.message || "Erro ao salvar usuário";
+        setMessage(message);
+      }
+    );
+  };
 
-    return (
-        <div className="d-flex">
-            <Sidebar />
-            <div className="p-3 w-100">
-                <Header
-                    goto={'/usuario'}
-                    title={'Novo Usuário'}
-                    logo={logo}
-                />
-                <section className="m-2 p-2 shadow-lg">
-                    <form className="row g-2 m-5 p-2 rounded-2 shadow" onSubmit={handleSubmit}>
-                        {!successful && (
-                            <>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputNome" className="form-label mb-1 fw-bold">Nome:</label>
-                                    <input  type="text" className="form-control" id="inputNome" 
-                                            name="nome"
-                                            value={formData.nome || ""}
-                                            onChange={handleChange} />
-                                </div>
-                                <div className="col-md-5">
-                                    <label htmlFor="inputEmail" className="form-label mb-1 fw-bold">Email:</label>
-                                    <input  type="email" className="form-control" id="inputEmail" 
-                                            name="email"
-                                            value={formData.email || ""}
-                                            onChange={handleChange}/>
-                                </div>
+  return (
+    <Box display="flex">
+      <Sidebar />
+      <Box p={3} width="100%">
+        <Header
+          goto={'/usuario'}
+          title={'Novo Usuário'}
+          logo={logo}
+        />
+        <Box m={2} p={2} boxShadow={3} borderRadius={2}>
+          <form onSubmit={handleSubmit} autoComplete="off">
+            {!successful && (
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={5}>
+                  <TextField
+                    fullWidth
+                    label="Nome"
+                    name="nome"
+                    value={formData.nome || ""}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={5}>
+                  <TextField
+                    fullWidth
+                    type="email"
+                    label="Email"
+                    name="email"
+                    value={formData.email || ""}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <FormControl fullWidth>
+                    <InputLabel id="acesso-label">Acesso</InputLabel>
+                    <Select
+                      labelId="acesso-label"
+                      id="inputAcesso"
+                      name="nivelAcesso"
+                      value={formData.nivelAcesso || ""}
+                      onChange={handleChange}
+                      label="Acesso"
+                    >
+                      <MenuItem value="" disabled>
+                        Nível de Acesso...
+                      </MenuItem>
+                      <MenuItem value="USER">USER</MenuItem>
+                      <MenuItem value="ADMIN">ADMIN</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-                                <div className="col-md-2">
-                                    <label htmlFor="inputAcesso" className="form-label mb-1 fw-bold">Acesso:</label>
-                                    <select id="inputAcesso" className="form-select" name="nivelAcesso"
-                                        defaultValue={''} onChange={(e) => handleChange(e)}>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary">
+                    Gravar
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
+            {message && (
+              <Box mt={2}>
+                <Alert severity={successful ? "success" : "error"}>
+                  {message}
+                </Alert>
+              </Box>
+            )}
+          </form>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
 
-                                        <option value={''} disabled>
-                                            Nível de Acesso...
-                                        </option>
-                                        <option value={"USER"}>USER</option>
-                                        <option value={"ADMIN"}>ADMIN</option>
-                                    </select>
-                                </div>
-
-                                <div className="col-12 my-2">
-                                    <button type="submit" className="btn btn-primary">
-                                        Gravar
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                        {message && (
-                            <div className="m-1">
-                                <div className={
-                                    "text-center h4 fst-italic py-4 rounded-2 border border-5 " + (successful ? "border-success" : "border-danger")
-                                }>
-                                    {message}
-                                </div>
-                            </div>
-                        )}
-                    </form>
-                </section>
-            </div>
-        </div>
-    )
-}
-
-export default UsuarioNovo
+export default UsuarioNovo;
