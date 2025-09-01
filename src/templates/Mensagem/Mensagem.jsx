@@ -10,7 +10,7 @@ import { ThemeContext } from "../../contexts/ThemeContext";
 const Mensagem = () => {
     const navigate = useNavigate();
     const [mensagens, setMensagens] = useState([]);
-    const [mostrarInativas, setMostrarInativas] = useState(false); // 👈 novo estado
+    const [mostrarLidas, setMostrarLidas] = useState(false); // 👈 novo estado
     const { theme } = useContext(ThemeContext);
     const buttonColor = theme === 'Claro' ? 'primary' : 'error';
 
@@ -61,14 +61,13 @@ const Mensagem = () => {
                             </Button>
                         </Link>
 
-                        {/* 👇 Botão para alternar exibição de inativas */}
                         <Button
                             variant="contained"
                             color="secondary"
-                            onClick={() => setMostrarInativas(!mostrarInativas)}
+                            onClick={() => setMostrarLidas(!mostrarLidas)}
                             sx={{ ml: 2 }}
                         >
-                            {mostrarInativas ? 'Ocultar Inativas' : 'Mostrar Inativas'}
+                            {mostrarLidas ? 'Ocultar Lidas' : 'Mostrar Lidas'}
                         </Button>
 
                         <Link to={'/sendmessage'} style={{ textDecoration: 'none' }}>
@@ -92,7 +91,7 @@ const Mensagem = () => {
                             </thead>
                             <tbody>
                                 {mensagens
-                                    .filter(m => mostrarInativas || m.statusMensagem !== 'INATIVO')
+                                    .filter(m => mostrarLidas || m.statusMensagem !== 'LIDA')
                                     .map((mensagem) => {
                                         const dataFormatada = new Date(mensagem.dataMensagem).toLocaleDateString('pt-BR');
                                         return (

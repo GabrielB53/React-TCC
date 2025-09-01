@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from "../../components/Menu/Sidebar";
 import MensagemService from "../../services/MensagemService";
@@ -14,6 +14,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { ThemeContext } from "../../contexts/ThemeContext";
 
 const MensagemLer = () => {
+    const navigate = useNavigate();
     const { id } = useParams();
     const { theme } = useContext(ThemeContext);
 
@@ -50,24 +51,14 @@ const MensagemLer = () => {
         setAlerta({ show: true, message, type });
         setTimeout(() => {
             setAlerta({ show: false, message: '', type: '' });
-        }, 4000);
-    };
-
-    const marcarComoLida = async () => {
-        try {
-            const response = await MensagemService.marcarComoLida(id);
-            exibirAlerta(response.data.message, "success");
-            carregarMensagem();
-        } catch (error) {
-            const msg = error.response?.data?.message || "Erro ao marcar como lida.";
-            exibirAlerta(msg, "error");
-        }
+            navigate("/mensagem")
+        }, 2000);
     };
 
     const inativarMensagem = async () => {
         try {
             const response = await MensagemService.inativar(id);
-            exibirAlerta(response.data.message, "warning");
+            exibirAlerta(response.data.message, "info");
             carregarMensagem();
         } catch (error) {
             const msg = error.response?.data?.message || "Erro ao inativar a mensagem.";
@@ -225,20 +216,13 @@ const MensagemLer = () => {
 
                             <Grid item xs={12} container justifyContent="space-around" sx={{ mt: 2 }}>
                                 <Button
-                                    variant="outlined"
+                                    variant="contained"
                                     color="warning"
-                                    onClick={marcarComoLida}
+                                    onClick={inativarMensagem}
                                 >
                                     Marcar como Lida
                                 </Button>
 
-                                <Button
-                                    variant="contained"
-                                    color="error"
-                                    onClick={inativarMensagem}
-                                >
-                                    Inativar
-                                </Button>
                             </Grid>
                         </Grid>
                     </form>
