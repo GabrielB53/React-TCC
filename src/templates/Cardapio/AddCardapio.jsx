@@ -4,6 +4,7 @@ import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
 import { useState } from "react";
 import CardapioService from "../../services/CardapioService";
+import CheckIcon from '@mui/icons-material/Check';
 
 const AddCardapio = () => {
     const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const AddCardapio = () => {
     });
 
     const [successful, setSuccessful] = useState(false);
+    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
     const [message, setMessage] = useState();
 
     const handleChange = (e) => {
@@ -59,6 +61,7 @@ const AddCardapio = () => {
         }).catch((error) => {
             const msg = error.response?.data?.message || "Erro ao criar cardápio.";
             setMessage(msg);
+            
         });
     };
 
@@ -73,6 +76,21 @@ const AddCardapio = () => {
                     logo={logo}
                 />
                 <section className="m-2 p-2 shadow-lg">
+                    {alerta.show && (
+                        <Alert
+                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+                            severity={alerta.type}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 16,
+                                right: 16,
+                                zIndex: 1000,
+                            }}
+                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
+                        >
+                            {alerta.message}
+                        </Alert>
+                    )}
                     <form className="row g-2 m-5 p-2 rounded-2 shadow" onSubmit={handleSubmit}>
                         {!successful && (
                             <>

@@ -4,7 +4,9 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isUserLoaded, setIsUserLoaded] = useState(false); // 👈 Novo estado
 
+  // Carrega o usuário ao iniciar
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("user");
@@ -14,6 +16,8 @@ export const UserProvider = ({ children }) => {
     } catch (error) {
       console.error("Erro ao carregar o usuário do localStorage:", error);
       setCurrentUser(null);
+    } finally {
+      setIsUserLoaded(true);
     }
   }, []);
 
@@ -31,7 +35,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ currentUser, setCurrentUser, clearUser }}>
+    <UserContext.Provider value={{ currentUser, setCurrentUser, clearUser, isUserLoaded }}>
       {children}
     </UserContext.Provider>
   );
