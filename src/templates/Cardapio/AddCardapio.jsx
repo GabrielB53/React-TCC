@@ -1,10 +1,21 @@
+import { useState,useContext } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
-import { useState } from "react";
 import CardapioService from "../../services/CardapioService";
-import CheckIcon from '@mui/icons-material/Check';
+import { ThemeContext } from "../../contexts/ThemeContext";
+import {
+    Box,
+    Grid,
+    TextField,
+    Button,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    Alert,
+} from '@mui/material';
 
 const AddCardapio = () => {
     const [formData, setFormData] = useState({
@@ -16,9 +27,9 @@ const AddCardapio = () => {
         fotoPreview: ""
     });
 
+    const { theme } = useContext(ThemeContext);
     const [successful, setSuccessful] = useState(false);
-    const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
-    const [message, setMessage] = useState();
+    const [message, setMessage] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,131 +72,172 @@ const AddCardapio = () => {
         }).catch((error) => {
             const msg = error.response?.data?.message || "Erro ao criar cardápio.";
             setMessage(msg);
-            
         });
     };
-
-
+    const textColor = theme === 'Claro' ? '' : 'white';
+    const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
+    const buttonColor = theme === 'Claro' ? 'primary' : 'error'
     return (
-        <div className="d-flex">
+        <Box display="flex">
             <Sidebar />
-            <div className="p-3 w-100">
+            <Box p={3} width="100%">
                 <Header
                     goto={'/cardapio'}
                     title={'Novo Cardápio'}
                     logo={logo}
                 />
-                <section className="m-2 p-2 shadow-lg">
-                    {alerta.show && (
-                        <Alert
-                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
-                            severity={alerta.type}
-                            sx={{
-                                position: 'absolute',
-                                bottom: 16,
-                                right: 16,
-                                zIndex: 1000,
-                            }}
-                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
-                        >
-                            {alerta.message}
-                        </Alert>
-                    )}
-                    <form className="row g-2 m-5 p-2 rounded-2 shadow" onSubmit={handleSubmit}>
+                <Box m={1} p={1} boxShadow={3} borderRadius={2}>
+                    <form onSubmit={handleSubmit} autoComplete="off">
                         {!successful && (
-                            <>
-                                <div className="col-md-6">
-                                    <label htmlFor="inputNome" className="form-label fw-bold">Nome:</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Nome"
                                         name="nome"
                                         value={formData.nome}
                                         onChange={handleChange}
-                                        required
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                     />
-                                </div>
+                                </Grid>
 
-                                <div className="col-md-6">
-                                    <label htmlFor="inputPratoId" className="form-label fw-bold">Prato ID:</label>
-                                    <input
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
                                         type="number"
-                                        className="form-control"
+                                        label="Prato ID"
                                         name="pratoId"
                                         value={formData.pratoId}
                                         onChange={handleChange}
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                         required
                                     />
-                                </div>
+                                </Grid>
 
-                                <div className="col-md-6">
-                                    <label htmlFor="inputDia" className="form-label fw-bold">Dia Servido:</label>
-                                    <input
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth
                                         type="date"
-                                        className="form-control"
+                                        label="Dia Servido"
                                         name="diaServido"
                                         value={formData.diaServido}
                                         onChange={handleChange}
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor }, shrink: true }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            }
+                                        }}
                                         required
                                     />
-                                </div>
+                                </Grid>
 
-                                <div className="col-md-6">
-                                    <label htmlFor="inputStatus" className="form-label fw-bold">Status:</label>
-                                    <select
-                                        className="form-select"
-                                        name="statusCardapio"
-                                        value={formData.statusCardapio}
-                                        onChange={handleChange}
+                                <Grid item xs={12} md={6}>
+                                    <FormControl fullWidth
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor },
+                                                '&:hover fieldset': { borderColor: textColor },
+                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                            },
+                                            '& .MuiInputBase-input': {
+                                                color: textColor,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: textColor,
+                                            },
+                                            '& .MuiSvgIcon-root': {
+                                                color: textColor,
+                                            }
+                                        }}>
+                                        <InputLabel id="status-label">Status</InputLabel>
+                                        <Select
+                                            labelId="status-label"
+                                            id="inputStatus"
+                                            name="statusCardapio"
+                                            value={formData.statusCardapio}
+                                            onChange={handleChange}
+                                            label="Status"
+                                        >
+                                            <MenuItem value="ATIVO">ATIVO</MenuItem>
+                                            <MenuItem value="INATIVO">INATIVO</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        color={buttonColor}
+                                        fullWidth
                                     >
-                                        <option value="ATIVO">ATIVO</option>
-                                        <option value="INATIVO">INATIVO</option>
-                                    </select>
-                                </div>
-
-                                <div className="col-md-12">
-                                    <label htmlFor="inputFoto" className="form-label fw-bold">Imagem do Cardápio:</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        accept="image/*"
-                                        onChange={handleImageChange}
-                                    />
-                                </div>
+                                        Enviar Imagem
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            hidden
+                                            onChange={handleImageChange}
+                                        />
+                                    </Button>
+                                </Grid>
 
                                 {formData.fotoPreview && (
-                                    <div className="col-md-12 text-center">
+                                    <Grid item xs={12} textAlign="center">
                                         <img
                                             src={formData.fotoPreview}
                                             alt="Preview"
-                                            className="img-fluid rounded mt-3"
-                                            style={{ maxHeight: "200px" }}
+                                            style={{ maxHeight: "200px", borderRadius: "8px", marginTop: "10px" }}
                                         />
-                                    </div>
+                                    </Grid>
                                 )}
 
-                                <div className="col-12 my-2">
-                                    <button type="submit" className="btn btn-primary">
+                                <Grid item xs={12}>
+                                    <Button type="submit" variant="contained" color="primary">
                                         Gravar
-                                    </button>
-                                </div>
-                            </>
+                                    </Button>
+                                </Grid>
+                            </Grid>
                         )}
 
                         {message && (
-                            <div className="col-12">
-                                <div className={
-                                    "text-center h4 fst-italic py-4 rounded-2 border border-5 " +
-                                    (successful ? "border-success" : "border-danger")
-                                }>
+                            <Box mt={2}>
+                                <Alert severity={successful ? "success" : "error"}>
                                     {message}
-                                </div>
-                            </div>
+                                </Alert>
+                            </Box>
                         )}
                     </form>
-                </section>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </Box>
     );
 };
 
