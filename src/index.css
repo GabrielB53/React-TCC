@@ -94,6 +94,11 @@ body {
   background-color: rgb(44, 21, 192);
 }
 
+#ContainerGraph{
+    width:100% ;
+    height:500px ;
+}
+
 /* Animação para tema claro */
 @keyframes gradient {
   0% {

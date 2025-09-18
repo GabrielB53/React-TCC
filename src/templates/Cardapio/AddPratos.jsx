@@ -3,18 +3,18 @@ import { Link } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
-import CardapioService from "../../services/CardapioService";
+import PratoService from "../../services/PratoService";
 import { ThemeContext } from "../../contexts/ThemeContext";
 import {
     Box, Grid, TextField, Button, Select, MenuItem, InputLabel, FormControl, Alert,
 } from '@mui/material';
 
-const AddCardapio = () => {
+const AddPratos = () => {
     const [formData, setFormData] = useState({
         nome: "",
         pratoId: "",
         diaServido: "",
-        statusCardapio: "ATIVO",
+        statusPrato: "ATIVO",
         fotoFile: null,
         fotoPreview: ""
     });
@@ -52,17 +52,17 @@ const AddCardapio = () => {
             return;
         }
 
-        CardapioService.create({
+        PratoService.create({
             nome: formData.nome,
             pratoId: formData.pratoId,
             diaServido: formData.diaServido,
-            statusCardapio: formData.statusCardapio,
+            statusPrato: formData.statusPrato,
             fotoFile: formData.fotoFile,
         }).then(() => {
-            setMessage("Cardápio criado com sucesso!");
+            setMessage("Prato criado com sucesso!");
             setSuccessful(true);
         }).catch((error) => {
-            const msg = error.response?.data?.message || "Erro ao criar cardápio.";
+            const msg = error.response?.data?.message || "Erro ao criar prato.";
             setMessage(msg);
         });
     };
@@ -75,7 +75,7 @@ const AddCardapio = () => {
             <Box p={3} width="100%">
                 <Header
                     goto={'/cardapio'}
-                    title={'Novo Cardápio'}
+                    title={'Nova Prato'}
                     logo={logo}
                 />
                 <Box m={1} p={1} boxShadow={3} borderRadius={2}>
@@ -173,8 +173,8 @@ const AddCardapio = () => {
                                         <Select
                                             labelId="status-label"
                                             id="inputStatus"
-                                            name="statusCardapio"
-                                            value={formData.statusCardapio}
+                                            name="statusPrato"
+                                            value={formData.statusPrato}
                                             onChange={handleChange}
                                             label="Status"
                                         >
@@ -233,4 +233,4 @@ const AddCardapio = () => {
     );
 };
 
-export default AddCardapio;
+export default AddPratos;

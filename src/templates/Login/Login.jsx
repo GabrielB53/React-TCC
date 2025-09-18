@@ -8,8 +8,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import UsuarioService from "../../services/UsuarioService";
-import { useUser } from '../../contexts/UserContext';  // importe o contexto do usuário
-import './Login.css';
+import { useUser } from '../../contexts/UserContext';  // importe o contexto do usuárion
 
 const Login = () => {
   const navigate = useNavigate();

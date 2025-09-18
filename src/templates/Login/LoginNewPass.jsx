@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { useUser } from '../../contexts/UserContext'; // caso queira usar
-import './Login.css';
+
 
 const LoginNewPass = () => {
   const navigate = useNavigate();
