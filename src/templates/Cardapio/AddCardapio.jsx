@@ -1,5 +1,5 @@
 import { useState,useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
@@ -8,8 +8,10 @@ import { ThemeContext } from "../../contexts/ThemeContext";
 import {
     Box, Grid, TextField, Button, Select, MenuItem, InputLabel, FormControl, Alert,
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 
 const AddCardapio = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nome: "",
         pratoId: "",
@@ -21,7 +23,18 @@ const AddCardapio = () => {
 
     const { theme } = useContext(ThemeContext);
     const [successful, setSuccessful] = useState(false);
-    const [message, setMessage] = useState("");
+
+    const [alerta, setAlerta] = useState({
+        show: false,
+        message: '',
+        type: '', // 'success', 'error', 'warning', 'info'
+    });
+    const exibirAlerta = (message, type = 'info') => {
+        setAlerta({ show: true, message, type });
+        setTimeout(() => {
+            setAlerta({ show: false, message: '', type: '' });
+        }, 4000);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -59,11 +72,13 @@ const AddCardapio = () => {
             statusCardapio: formData.statusCardapio,
             fotoFile: formData.fotoFile,
         }).then(() => {
-            setMessage("Cardápio criado com sucesso!");
             setSuccessful(true);
+            exibirAlerta("Cardápio criado com sucesso!", "success");
+            setTimeout(() => {
+                navigate("/cardapio");
+            }, 2000);
         }).catch((error) => {
-            const msg = error.response?.data?.message || "Erro ao criar cardápio.";
-            setMessage(msg);
+            exibirAlerta("Cardápio não teve exito na execução!", "error");
         });
     };
     const textColor = theme === 'Claro' ? '' : 'white';
@@ -79,8 +94,22 @@ const AddCardapio = () => {
                     logo={logo}
                 />
                 <Box m={1} p={1} boxShadow={3} borderRadius={2}>
+                    {alerta.show && (
+                        <Alert
+                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+                            severity={alerta.type}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                right: 16,
+                                zIndex: 1000,
+                            }}
+                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
+                        >
+                    {alerta.message}
+                        </Alert>
+                    )}
                     <form onSubmit={handleSubmit} autoComplete="off">
-                        {!successful && (
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -217,15 +246,6 @@ const AddCardapio = () => {
                                     </Button>
                                 </Grid>
                             </Grid>
-                        )}
-
-                        {message && (
-                            <Box mt={2}>
-                                <Alert severity={successful ? "success" : "error"}>
-                                    {message}
-                                </Alert>
-                            </Box>
-                        )}
                     </form>
                 </Box>
             </Box>
