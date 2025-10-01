@@ -1,5 +1,5 @@
 import { useState,useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
@@ -8,11 +8,13 @@ import { ThemeContext } from "../../contexts/ThemeContext";
 import {
     Box, Grid, TextField, Button, Select, MenuItem, InputLabel, FormControl, Alert,
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 
 const AddProduto = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nome: "",
-        pratoId: "",
+        produtoId: "",
         diaServido: "",
         statusProduto: "ATIVO",
         fotoFile: null,
@@ -21,7 +23,18 @@ const AddProduto = () => {
 
     const { theme } = useContext(ThemeContext);
     const [successful, setSuccessful] = useState(false);
-    const [message, setMessage] = useState("");
+
+    const [alerta, setAlerta] = useState({
+        show: false,
+        message: '',
+        type: '', // 'success', 'error', 'warning', 'info'
+    });
+    const exibirAlerta = (message, type = 'info') => {
+        setAlerta({ show: true, message, type });
+        setTimeout(() => {
+            setAlerta({ show: false, message: '', type: '' });
+        }, 4000);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -47,23 +60,25 @@ const AddProduto = () => {
         e.preventDefault();
         setSuccessful(false);
 
-        if (!formData.pratoId || isNaN(formData.pratoId)) {
-            setMessage("Por favor, informe um ID de prato válido.");
+        if (!formData.produtoId || isNaN(formData.produtoId)) {
+            setMessage("Por favor, informe um ID de produto válido.");
             return;
         }
 
         ProdutoService.create({
             nome: formData.nome,
-            pratoId: formData.pratoId,
+            produtoId: formData.produtoId,
             diaServido: formData.diaServido,
             statusProduto: formData.statusProduto,
             fotoFile: formData.fotoFile,
         }).then(() => {
-            setMessage("Produto criado com sucesso!");
             setSuccessful(true);
+            exibirAlerta("Produto criado com sucesso!", "success");
+            setTimeout(() => {
+                navigate("/produto");
+            }, 2000);
         }).catch((error) => {
-            const msg = error.response?.data?.message || "Erro ao criar produto.";
-            setMessage(msg);
+            exibirAlerta("Produto não teve exito na execução!", "error");
         });
     };
     const textColor = theme === 'Claro' ? '' : 'white';
@@ -74,13 +89,27 @@ const AddProduto = () => {
             <Sidebar />
             <Box p={3} width="100%">
                 <Header
-                    goto={'/cardapio'}
-                    title={'Nova Produto'}
+                    goto={'/produto'}
+                    title={'Novo Produto!'}
                     logo={logo}
                 />
                 <Box m={1} p={1} boxShadow={3} borderRadius={2}>
+                    {alerta.show && (
+                        <Alert
+                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+                            severity={alerta.type}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                right: 16,
+                                zIndex: 1000,
+                            }}
+                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
+                        >
+                    {alerta.message}
+                        </Alert>
+                    )}
                     <form onSubmit={handleSubmit} autoComplete="off">
-                        {!successful && (
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -107,9 +136,9 @@ const AddProduto = () => {
                                     <TextField
                                         fullWidth
                                         type="number"
-                                        label="Prato ID"
-                                        name="pratoId"
-                                        value={formData.pratoId}
+                                        label="Produto ID"
+                                        name="produtoId"
+                                        value={formData.produtoId}
                                         onChange={handleChange}
                                         InputProps={{ style: { color: textColor } }}
                                         InputLabelProps={{ style: { color: textColor } }}
@@ -217,15 +246,6 @@ const AddProduto = () => {
                                     </Button>
                                 </Grid>
                             </Grid>
-                        )}
-
-                        {message && (
-                            <Box mt={2}>
-                                <Alert severity={successful ? "success" : "error"}>
-                                    {message}
-                                </Alert>
-                            </Box>
-                        )}
                     </form>
                 </Box>
             </Box>

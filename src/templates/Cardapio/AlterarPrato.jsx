@@ -3,17 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from "../../components/Menu/Sidebar";
 import logo from "../../assets/images/home.png";
-import CategoriaService from "../../services/CategoriaService";
+import PratoService from "../../services/PratoService";
 import { Alert, Button, TextField, Grid, Paper, Box, ButtonGroup } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import { ThemeContext } from "../../contexts/ThemeContext";
 
-const AlterarCategoria = () => {
+const AlterarPrato = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { theme } = useContext(ThemeContext);
 
-    const [categoria, setCategoria] = useState({
+    const [prato, setPrato] = useState({
         id: null,
         nome: "",
         diaServido: "",
@@ -22,9 +22,9 @@ const AlterarCategoria = () => {
     const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
 
     useEffect(() => {
-        CategoriaService.findById(id)
+        PratoService.findById(id)
             .then((response) => {
-                setCategoria(response.data);
+                setPrato(response.data);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao buscar cardápio.', type: 'error' });
@@ -33,15 +33,15 @@ const AlterarCategoria = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setCategoria(prev => ({ ...prev, [name]: value }));
+        setPrato(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        CategoriaService.update(id, categoria)
+        PratoService.update(id, prato)
             .then(() => {
                 setAlerta({ show: true, message: 'cardápio atualizado com sucesso!', type: 'success' });
-                setTimeout(() => navigate('/categorialista'), 1000);
+                setTimeout(() => navigate('/pratolista'), 1000);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao atualizar cardápio.', type: 'error' });
@@ -49,10 +49,10 @@ const AlterarCategoria = () => {
     };
 
     const inativar = () => {
-        CategoriaService.inativar(id)
+        PratoService.inativar(id)
             .then(() => {
                 setAlerta({ show: true, message: 'Carrdápio inativado com sucesso!', type: 'success' });
-                setTimeout(() => navigate('/categorialista'), 1000);
+                setTimeout(() => navigate('/pratolista'), 1000);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao inativar cardápio.', type: 'error' });
@@ -60,10 +60,10 @@ const AlterarCategoria = () => {
     };
 
     const reativar = () => {
-        CategoriaService.reativar(id)
+        PratoService.reativar(id)
             .then(() => {
-                setAlerta({ show: true, message: 'Categoria reativado com sucesso!', type: 'success' });
-                setTimeout(() => navigate('/categorialista'), 2000);
+                setAlerta({ show: true, message: 'Prato reativado com sucesso!', type: 'success' });
+                setTimeout(() => navigate('/pratolista'), 2000);
             })
             .catch(() => {
                 setAlerta({ show: true, message: 'Erro ao reativar cardápio.', type: 'error' });
@@ -79,8 +79,8 @@ const AlterarCategoria = () => {
             <Sidebar />
             <div className="p-3 w-100">
                 <Header
-                    goto={'/categoria'}
-                    title={'Editar Categoria'}
+                    goto={'/prato'}
+                    title={'Editar Prato'}
                     logo={logo}
                 />
 
@@ -107,7 +107,7 @@ const AlterarCategoria = () => {
                                 <Grid item xs={12} sm={2}>
                                     <TextField
                                         label="ID"
-                                        value={categoria.id || ''}
+                                        value={prato.id || ''}
                                         fullWidth
                                         InputProps={{ readOnly: true, style: { color: textColor } }}
                                         InputLabelProps={{ style: { color: textColor } }}
@@ -127,7 +127,7 @@ const AlterarCategoria = () => {
                                     <TextField
                                         label="Nome"
                                         name="nome"
-                                        value={categoria.nome}
+                                        value={prato.nome}
                                         onChange={handleChange}
                                         fullWidth
                                         InputProps={{ style: { color: textColor } }}
@@ -149,7 +149,7 @@ const AlterarCategoria = () => {
                                         label="Dia"
                                         name="diaServido"
                                         type="text"
-                                        value={categoria.diaServido}
+                                        value={prato.diaServido}
                                         onChange={handleChange}
                                         fullWidth
                                         InputProps={{ style: { color: textColor } }}
@@ -169,7 +169,7 @@ const AlterarCategoria = () => {
                                 <Grid item xs={12} sm={4}>
                                     <TextField
                                         label="Status"
-                                        value={categoria.statusCategoria || ''}
+                                        value={prato.statusPrato || ''}
                                         fullWidth
                                         InputProps={{ readOnly: true, style: { color: textColor } }}
                                         InputLabelProps={{ style: { color: textColor } }}
@@ -190,10 +190,10 @@ const AlterarCategoria = () => {
                                 </Grid>
 
                                 <Grid item xs={12} sm={5}>
-                                    {categoria.foto && (
+                                    {prato.foto && (
                                         <img
-                                            src={categoria.foto}
-                                            alt="Imagem do Categoria"
+                                            src={prato.foto}
+                                            alt="Imagem do Prato"
                                             style={{
                                                 width: '100%',
                                                 maxHeight: '250px',
@@ -223,4 +223,4 @@ const AlterarCategoria = () => {
     );
 };
 
-export default AlterarCategoria;
+export default AlterarPrato;

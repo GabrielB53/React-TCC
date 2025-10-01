@@ -14,9 +14,6 @@ const Cardapio = () => {
     const alterarCardapio = () => {
         navigate('/cardapiolista');
     };
-    const deletarCardapio = () => {
-        navigate('/deletarcardapio')
-    };
     return (
         <div className="d-flex">
             <Sidebar />
