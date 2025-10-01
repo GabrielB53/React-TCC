@@ -25,6 +25,9 @@ import UsuarioPerfil from "../templates/Usuario/UsuarioPerfil"
 import UsuarioAlterarSenha from "../templates/Usuario/UsuarioAlterarSenha"
 import RotaProtegida from "./Acesso/RotaProtegida"
 import SendMessage from "../templates/Mensagem/SendMessage"
+import AddCategoria from "../templates/Cardapio/AddCategoria"
+import AddPrato from "../templates/Cardapio/AddPratos"
+import AddProduto from "../templates/Cardapio/AddProdutos"
 
 
 const AppRoutes = () => {
@@ -56,6 +59,9 @@ const AppRoutes = () => {
         <Route path="/grafico" element={<RotaProtegida><Grafico /></RotaProtegida>} />
         
         <Route path="/addcardapio" element={<RotaProtegida><AddCardapio /></RotaProtegida>} />
+        <Route path="/addcategoria" element={<RotaProtegida>< AddCategoria/></RotaProtegida>} />
+        <Route path="/addprato" element={<RotaProtegida>< AddPrato/></RotaProtegida>} />
+        <Route path="/addproduto" element={<RotaProtegida>< AddProduto/></RotaProtegida>} />
         <Route path="/alterarcardapio/:id" element={<RotaProtegida><AlterarCardapio /></RotaProtegida>} />
         <Route path="/cardapio" element={<RotaProtegida><Cardapio /></RotaProtegida>} />
         <Route path="/cardapiolista" element={<RotaProtegida><CardapioLista/></RotaProtegida>}/>

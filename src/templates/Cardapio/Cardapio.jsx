@@ -14,6 +14,15 @@ const Cardapio = () => {
     const alterarCardapio = () => {
         navigate('/cardapiolista');
     };
+    const novaCategoria = () => {
+        navigate('/addcategoria');
+    };
+    const novoPrato = () => {
+        navigate('/addprato');
+    };
+    const novoProduto = () => {
+        navigate('/addproduto');
+    };
     return (
         <div className="d-flex">
             <Sidebar />
@@ -36,7 +45,7 @@ const Cardapio = () => {
                     <div className="d-flex justify-content-between">
                         <h3 className="pb-2">Categorias</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={novaCategoria}>Adicionar</Button>
                             <Button onClick={alterarCardapio}>Lista</Button>
                         </ButtonGroup>
                     </div>
@@ -45,7 +54,7 @@ const Cardapio = () => {
                     <div className="d-flex justify-content-between">
                         <h3 className="pb-2">Pratos</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={novoPrato}>Adicionar</Button>
                             <Button onClick={alterarCardapio}>Lista</Button>
                         </ButtonGroup>
                     </div>
@@ -54,7 +63,7 @@ const Cardapio = () => {
                     <div className="d-flex justify-content-between">
                         <h3 className="pb-2">Produtos</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                            <Button onClick={novoCardapio}>Adicionar</Button>
+                            <Button onClick={novoProduto}>Adicionar</Button>
                             <Button onClick={alterarCardapio}>Lista</Button>
                         </ButtonGroup>
                     </div>

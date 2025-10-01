@@ -89,7 +89,7 @@ const AddPrato = () => {
             <Sidebar />
             <Box p={3} width="100%">
                 <Header
-                    goto={'/prato'}
+                    goto={'/cardapio'}
                     title={'Novo Prato'}
                     logo={logo}
                 />
