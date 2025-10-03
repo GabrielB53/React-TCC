@@ -1,5 +1,5 @@
 import { useState,useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
 import logo from '../../assets/images/home.png';
@@ -8,20 +8,29 @@ import { ThemeContext } from "../../contexts/ThemeContext";
 import {
     Box, Grid, TextField, Button, Select, MenuItem, InputLabel, FormControl, Alert,
 } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 
 const AddCategoria = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nome: "",
-        pratoId: "",
-        diaServido: "",
         statusCategoria: "ATIVO",
-        fotoFile: null,
-        fotoPreview: ""
     });
 
     const { theme } = useContext(ThemeContext);
     const [successful, setSuccessful] = useState(false);
-    const [message, setMessage] = useState("");
+
+    const [alerta, setAlerta] = useState({
+        show: false,
+        message: '',
+        type: '', // 'success', 'error', 'warning', 'info'
+    });
+    const exibirAlerta = (message, type = 'info') => {
+        setAlerta({ show: true, message, type });
+        setTimeout(() => {
+            setAlerta({ show: false, message: '', type: '' });
+        }, 4000);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -54,16 +63,16 @@ const AddCategoria = () => {
 
         CategoriaService.create({
             nome: formData.nome,
-            pratoId: formData.pratoId,
-            diaServido: formData.diaServido,
             statusCategoria: formData.statusCategoria,
-            fotoFile: formData.fotoFile,
+
         }).then(() => {
-            setMessage("Categoria criado com sucesso!");
             setSuccessful(true);
+            exibirAlerta("Categoria criada com sucesso!", "success");
+            setTimeout(() => {
+                navigate("/categoria");
+            }, 2000);
         }).catch((error) => {
-            const msg = error.response?.data?.message || "Erro ao criar categoria.";
-            setMessage(msg);
+            exibirAlerta("Categoria não teve exito na execução!", "error");
         });
     };
     const textColor = theme === 'Claro' ? '' : 'white';
@@ -74,13 +83,27 @@ const AddCategoria = () => {
             <Sidebar />
             <Box p={3} width="100%">
                 <Header
-                    goto={'/cardapio'}
-                    title={'Nova Categoria'}
+                    goto={'/categoria'}
+                    title={'Nova categoria'}
                     logo={logo}
                 />
                 <Box m={1} p={1} boxShadow={3} borderRadius={2}>
+                    {alerta.show && (
+                        <Alert
+                            icon={alerta.type === 'success' ? <CheckIcon fontSize="inherit" /> : null}
+                            severity={alerta.type}
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                right: 16,
+                                zIndex: 1000,
+                            }}
+                            onClose={() => setAlerta({ show: false, message: '', type: '' })}
+                        >
+                    {alerta.message}
+                        </Alert>
+                    )}
                     <form onSubmit={handleSubmit} autoComplete="off">
-                        {!successful && (
                             <Grid container spacing={2}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -100,52 +123,6 @@ const AddCategoria = () => {
                                                 '&.Mui-focused fieldset': { borderColor: textColor },
                                             }
                                         }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        type="number"
-                                        label="Prato ID"
-                                        name="pratoId"
-                                        value={formData.pratoId}
-                                        onChange={handleChange}
-                                        InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor } }}
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            }
-                                        }}
-                                        required
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        type="date"
-                                        label="Dia Servido"
-                                        name="diaServido"
-                                        value={formData.diaServido}
-                                        onChange={handleChange}
-                                        InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor }, shrink: true }}
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            }
-                                        }}
-                                        required
                                     />
                                 </Grid>
 
@@ -185,47 +162,11 @@ const AddCategoria = () => {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Button
-                                        variant="contained"
-                                        component="label"
-                                        color={buttonColor}
-                                        fullWidth
-                                    >
-                                        Enviar Imagem
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            hidden
-                                            onChange={handleImageChange}
-                                        />
-                                    </Button>
-                                </Grid>
-
-                                {formData.fotoPreview && (
-                                    <Grid item xs={12} textAlign="center">
-                                        <img
-                                            src={formData.fotoPreview}
-                                            alt="Preview"
-                                            style={{ maxHeight: "200px", borderRadius: "8px", marginTop: "10px" }}
-                                        />
-                                    </Grid>
-                                )}
-
-                                <Grid item xs={12}>
                                     <Button type="submit" variant="contained" color="primary">
                                         Gravar
                                     </Button>
                                 </Grid>
                             </Grid>
-                        )}
-
-                        {message && (
-                            <Box mt={2}>
-                                <Alert severity={successful ? "success" : "error"}>
-                                    {message}
-                                </Alert>
-                            </Box>
-                        )}
                     </form>
                 </Box>
             </Box>
