@@ -75,7 +75,7 @@ const AddProduto = () => {
             setSuccessful(true);
             exibirAlerta("Produto criado com sucesso!", "success");
             setTimeout(() => {
-                navigate("/produto");
+                navigate("/cardapio");
             }, 2000);
         }).catch((error) => {
             exibirAlerta("Produto não teve exito na execução!", "error");

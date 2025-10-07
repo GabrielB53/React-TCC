@@ -56,10 +56,6 @@ const AddCategoria = () => {
         e.preventDefault();
         setSuccessful(false);
 
-        if (!formData.pratoId || isNaN(formData.pratoId)) {
-            setMessage("Por favor, informe um ID de prato válido.");
-            return;
-        }
 
         CategoriaService.create({
             nome: formData.nome,
@@ -69,7 +65,7 @@ const AddCategoria = () => {
             setSuccessful(true);
             exibirAlerta("Categoria criada com sucesso!", "success");
             setTimeout(() => {
-                navigate("/categoria");
+                navigate("/cardapio");
             }, 2000);
         }).catch((error) => {
             exibirAlerta("Categoria não teve exito na execução!", "error");
@@ -83,7 +79,7 @@ const AddCategoria = () => {
             <Sidebar />
             <Box p={3} width="100%">
                 <Header
-                    goto={'/categoria'}
+                    goto={'/cardapio'}
                     title={'Nova categoria'}
                     logo={logo}
                 />

@@ -60,22 +60,17 @@ const AddPrato = () => {
         e.preventDefault();
         setSuccessful(false);
 
-        if (!formData.pratoId || isNaN(formData.pratoId)) {
-            setMessage("Por favor, informe um ID de prato válido.");
-            return;
-        }
-
         PratoService.create({
             nome: formData.nome,
-            pratoId: formData.pratoId,
-            diaServido: formData.diaServido,
+            descricao: formData. descricao,
+            infoNutricional: formData.infoNutricional,
             statusPrato: formData.statusPrato,
-            fotoFile: formData.fotoFile,
+
         }).then(() => {
             setSuccessful(true);
             exibirAlerta("Prato criado com sucesso!", "success");
             setTimeout(() => {
-                navigate("/prato");
+                navigate("/cardapio");
             }, 2000);
         }).catch((error) => { 
             exibirAlerta("Prato não teve exito na execução!", "error");
@@ -131,14 +126,12 @@ const AddPrato = () => {
                                         }}
                                     />
                                 </Grid>
-
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth
-                                        type="number"
-                                        label="Prato ID"
-                                        name="pratoId"
-                                        value={formData.pratoId}
+                                        label="Descrição"
+                                        name="descricao"
+                                        value={formData.descricao}
                                         onChange={handleChange}
                                         InputProps={{ style: { color: textColor } }}
                                         InputLabelProps={{ style: { color: textColor } }}
@@ -151,20 +144,17 @@ const AddPrato = () => {
                                                 '&.Mui-focused fieldset': { borderColor: textColor },
                                             }
                                         }}
-                                        required
                                     />
                                 </Grid>
-
                                 <Grid item xs={12} md={6}>
-                                    <TextField
+                                <TextField
                                         fullWidth
-                                        type="date"
-                                        label="Dia Servido"
-                                        name="diaServido"
-                                        value={formData.diaServido}
+                                        label="Info Nutricional"
+                                        name="Infonutricional"
+                                        value={formData.infoNutricional}
                                         onChange={handleChange}
                                         InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor }, shrink: true }}
+                                        InputLabelProps={{ style: { color: textColor } }}
                                         sx={{
                                             backgroundColor: background,
                                             borderRadius: 1,
@@ -174,7 +164,6 @@ const AddPrato = () => {
                                                 '&.Mui-focused fieldset': { borderColor: textColor },
                                             }
                                         }}
-                                        required
                                     />
                                 </Grid>
 
