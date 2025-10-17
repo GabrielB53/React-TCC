@@ -14,8 +14,10 @@ const AddPrato = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nome: "",
-        pratoId: "",
-        diaServido: "",
+        descricao: "",
+        principal:"",
+        secundario:""
+        acompanhamento:"",
         statusPrato: "ATIVO",
         fotoFile: null,
         fotoPreview: ""

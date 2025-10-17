@@ -14,8 +14,7 @@ const AddProduto = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nome: "",
-        produtoId: "",
-        diaServido: "",
+        descricao: "",
         statusProduto: "ATIVO",
         fotoFile: null,
         fotoPreview: ""
