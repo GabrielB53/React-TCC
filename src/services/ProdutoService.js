@@ -1,92 +1,69 @@
-import http from "../common/http-common";
-const API_URL = "produto/";
+import http from '../common/http-common';
+
+const API_URL = "cardapio/";
 
 const findAll = () => {
-  return http.mainInstance.get(API_URL + "findAll");
+  return http.mainInstance.get(API_URL + 'findAll');
 };
 
-const findById = id => {
+const findById = (id) => {
   return http.mainInstance.get(API_URL + `findById/${id}`);
 };
 
-const createSemFoto = (data) => {
+
+const create = (data) => {
   const formData = new FormData();
 
-  formData.append('nome', data.nome);
-  formData.append('descricao', data.descricao);
-  formData.append('codigoBarras', data.codigoBarras);
-  formData.append('preco', data.preco);
-  formData.append('categoria', data.categoria);
+  const cardapioDTO = {
+    nome: data.nome,
+    descricao: data.descricao,
+    porcao: data.porcao,
+    infoNutricional: data.infoNutricional,
+    categoriaId: parseInt(data.pratoId),
+    statusProduto: data.statusProduto
 
-  return http.mainInstance.post(API_URL + "createSemFoto", formData);
-};
+  };
 
-const createComFoto = (file, data) => {
-  const formData = new FormData();
+  formData.append("cardapio", new Blob([JSON.stringify(cardapioDTO)], {
+    type: "application/json"
+  }));
 
-  formData.append('file', file);
-  formData.append('nome', data.nome);
-  formData.append('descricao', data.descricao);
-  formData.append('codigoBarras', data.codigoBarras);
-  formData.append('preco', data.preco);
-  formData.append('categoria', data.categoria);
-
-  for (const key of formData.entries()) {
-    console.log(key[0] + ', ' + key[1]);
-  } 
-
-  return http.multipartInstance.post(API_URL + "createComFoto", formData);
-};
-
-const alterar = (file, id, data) => {
-  const formData = new FormData();
-
-  formData.append('file', file);
-  formData.append('nome', data.nome);
-  formData.append('descricao', data.descricao);
-  formData.append('preco', data.preco);
-  
-  if (data.categoria.id === undefined) { // SE O USUÁRIO ALTEROU A "Categoria"
-    formData.append('categoria', data.categoria.toString());
-  } else { // SE O USUÁRIO NÃO ALTEROU A "Categoria"
-    formData.append('categoria', data.categoria.id);
+  // Adiciona o arquivo, se existir
+  if (data.fotoFile) {
+    formData.append("file", data.fotoFile);
   }
 
-/*
-  for (const key of formData.entries()) {
-    console.log(key[0] + ', ' + key[1]);
-  } 
-*/
-  return http.multipartInstance.put(API_URL + `alterar/${id}`, formData);
+  return http.mainInstance.post(API_URL + "create", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  });
 };
 
+const editar = (id, data) => {
+  return http.mainInstance.put(API_URL + `editar/${id}`, data);
+};
 
 const inativar = (id) => {
-  return http.multipartInstance.put(API_URL + `inativar/${id}`);
+  return http.mainInstance.put(API_URL + `inativar/${id}`);
 };
 
 const reativar = (id) => {
-  return http.multipartInstance.put(API_URL + `reativar/${id}`);
+  return http.mainInstance.put(API_URL + `reativar/${id}`);
 };
 
-const addCardapio = (id) => {
-  return http.multipartInstance.put(API_URL + `addCardapio/${id}`);
+const findByNome = (nome) => {
+  return http.mainInstance.get(API_URL + `findByNome?nome=${nome}`);
 };
 
-const findAllCardapio = () => {
-  return http.mainInstance.get(API_URL + "findAllCardapio");
-};
-
-const ProdutoService = {
+const CardapioService = {
   findAll,
   findById,
-  createSemFoto,
-  createComFoto,
-  alterar,
+  create,
+  editar,
   inativar,
   reativar,
-  addCardapio,
-  findAllCardapio
+  findByNome
 };
 
-export default ProdutoService;
+export default CardapioService;
