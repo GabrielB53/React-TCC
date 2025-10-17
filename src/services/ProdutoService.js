@@ -1,6 +1,6 @@
 import http from '../common/http-common';
 
-const API_URL = "cardapio/";
+const API_URL = "produto/";
 
 const findAll = () => {
   return http.mainInstance.get(API_URL + 'findAll');
@@ -14,7 +14,7 @@ const findById = (id) => {
 const create = (data) => {
   const formData = new FormData();
 
-  const cardapioDTO = {
+  const produtoDTO = {
     nome: data.nome,
     descricao: data.descricao,
     porcao: data.porcao,
@@ -24,7 +24,7 @@ const create = (data) => {
 
   };
 
-  formData.append("cardapio", new Blob([JSON.stringify(cardapioDTO)], {
+  formData.append("produto", new Blob([JSON.stringify(produtoDTO)], {
     type: "application/json"
   }));
 
@@ -56,7 +56,7 @@ const findByNome = (nome) => {
   return http.mainInstance.get(API_URL + `findByNome?nome=${nome}`);
 };
 
-const CardapioService = {
+const ProdutoService = {
   findAll,
   findById,
   create,
@@ -66,4 +66,4 @@ const CardapioService = {
   findByNome
 };
 
-export default CardapioService;
+export default ProdutoService;

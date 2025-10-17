@@ -167,7 +167,7 @@ const LoginNewPass = () => {
                 {message}
               </Typography>
               <Box textAlign="center" mt={2}>
-                <Link to="/login">
+                <Link to="/home">
                   <Button variant="contained" color="warning">
                     Acessar o sistema
                   </Button>

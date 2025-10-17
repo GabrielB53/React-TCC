@@ -1,4 +1,4 @@
-import { useState,useContext } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import Sidebar from '../../components/Menu/Sidebar';
@@ -15,12 +15,11 @@ const AddPrato = () => {
     const [formData, setFormData] = useState({
         nome: "",
         descricao: "",
-        principal:"",
-        secundario:""
-        acompanhamento:"",
+        principal: "",
+        secundario: "",
+        acompanhamento: "",
         statusPrato: "ATIVO",
-        fotoFile: null,
-        fotoPreview: ""
+
     });
 
     const { theme } = useContext(ThemeContext);
@@ -64,8 +63,10 @@ const AddPrato = () => {
 
         PratoService.create({
             nome: formData.nome,
-            descricao: formData. descricao,
-            infoNutricional: formData.infoNutricional,
+            descricao: formData.descricao,
+            principal: formData.principal,
+            secundario: formData.secundario,
+            acompanhamento: formData.acompanhamento,
             statusPrato: formData.statusPrato,
 
         }).then(() => {
@@ -74,7 +75,7 @@ const AddPrato = () => {
             setTimeout(() => {
                 navigate("/cardapio");
             }, 2000);
-        }).catch((error) => { 
+        }).catch((error) => {
             exibirAlerta("Prato não teve exito na execução!", "error");
         });
     };
@@ -103,140 +104,156 @@ const AddPrato = () => {
                             }}
                             onClose={() => setAlerta({ show: false, message: '', type: '' })}
                         >
-                    {alerta.message}
+                            {alerta.message}
                         </Alert>
                     )}
                     <form onSubmit={handleSubmit} autoComplete="off">
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Nome"
-                                        name="nome"
-                                        value={formData.nome}
-                                        onChange={handleChange}
-                                        InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor } }}
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Descrição"
-                                        name="descricao"
-                                        value={formData.descricao}
-                                        onChange={handleChange}
-                                        InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor } }}
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6}>
                                 <TextField
-                                        fullWidth
-                                        label="Info Nutricional"
-                                        name="Infonutricional"
-                                        value={formData.infoNutricional}
-                                        onChange={handleChange}
-                                        InputProps={{ style: { color: textColor } }}
-                                        InputLabelProps={{ style: { color: textColor } }}
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            }
-                                        }}
-                                    />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <FormControl fullWidth
-                                        sx={{
-                                            backgroundColor: background,
-                                            borderRadius: 1,
-                                            '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
-                                            },
-                                            '& .MuiInputBase-input': {
-                                                color: textColor,
-                                            },
-                                            '& .MuiInputLabel-root': {
-                                                color: textColor,
-                                            },
-                                            '& .MuiSvgIcon-root': {
-                                                color: textColor,
-                                            }
-                                        }}>
-                                        <InputLabel id="status-label">Status</InputLabel>
-                                        <Select
-                                            labelId="status-label"
-                                            id="inputStatus"
-                                            name="statusPrato"
-                                            value={formData.statusPrato}
-                                            onChange={handleChange}
-                                            label="Status"
-                                        >
-                                            <MenuItem value="ATIVO">ATIVO</MenuItem>
-                                            <MenuItem value="INATIVO">INATIVO</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <Button
-                                        variant="contained"
-                                        component="label"
-                                        color={buttonColor}
-                                        fullWidth
-                                    >
-                                        Enviar Imagem
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            hidden
-                                            onChange={handleImageChange}
-                                        />
-                                    </Button>
-                                </Grid>
-
-                                {formData.fotoPreview && (
-                                    <Grid item xs={12} textAlign="center">
-                                        <img
-                                            src={formData.fotoPreview}
-                                            alt="Preview"
-                                            style={{ maxHeight: "200px", borderRadius: "8px", marginTop: "10px" }}
-                                        />
-                                    </Grid>
-                                )}
-
-                                <Grid item xs={12}>
-                                    <Button type="submit" variant="contained" color="primary">
-                                        Gravar
-                                    </Button>
-                                </Grid>
+                                    fullWidth
+                                    label="Nome"
+                                    name="nome"
+                                    value={formData.nome}
+                                    onChange={handleChange}
+                                    InputProps={{ style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
                             </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Descrição"
+                                    name="descricao"
+                                    value={formData.descricao}
+                                    onChange={handleChange}
+                                    InputProps={{ style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Principal"
+                                    name="principal"
+                                    value={formData.principal}
+                                    onChange={handleChange}
+                                    InputProps={{ style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="secundario"
+                                    name="secundario"
+                                    value={formData.secundario}
+                                    onChange={handleChange}
+                                    InputProps={{ style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Acompanhamento"
+                                    name="acompanhamento"
+                                    value={formData.acompanhamento}
+                                    onChange={handleChange}
+                                    InputProps={{ style: { color: textColor } }}
+                                    InputLabelProps={{ style: { color: textColor } }}
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        }
+                                    }}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <FormControl fullWidth
+                                    sx={{
+                                        backgroundColor: background,
+                                        borderRadius: 1,
+                                        '& .MuiOutlinedInput-root': {
+                                            '& fieldset': { borderColor: textColor },
+                                            '&:hover fieldset': { borderColor: textColor },
+                                            '&.Mui-focused fieldset': { borderColor: textColor },
+                                        },
+                                        '& .MuiInputBase-input': {
+                                            color: textColor,
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: textColor,
+                                        },
+                                        '& .MuiSvgIcon-root': {
+                                            color: textColor,
+                                        }
+                                    }}>
+                                    <InputLabel id="status-label">Status</InputLabel>
+                                    <Select
+                                        labelId="status-label"
+                                        id="inputStatus"
+                                        name="statusPrato"
+                                        value={formData.statusPrato}
+                                        onChange={handleChange}
+                                        label="Status"
+                                    >
+                                        <MenuItem value="ATIVO">ATIVO</MenuItem>
+                                        <MenuItem value="INATIVO">INATIVO</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Button type="submit" variant="contained" color="primary">
+                                    Gravar
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </form>
                 </Box>
             </Box>
