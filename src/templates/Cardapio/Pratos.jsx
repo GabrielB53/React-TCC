@@ -2,18 +2,27 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../components/Menu/Sidebar';
 import Header from '../../components/Header/Header';
-import { Alert, Button, Badge, Box } from '@mui/material';
+import {
+  Alert,
+  Button,
+  Badge,
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Typography
+} from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import logo from '../../assets/images/home.png';
-import { ThemeContext } from "../../contexts/ThemeContext";
-import CardapioService from '../../services/CardapioService';
+import { ThemeContext } from '../../contexts/ThemeContext';
+import PratoService from '../../services/PratoService';
 
-const CardapioLista = () => {
+const PratoLista = () => {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
 
-  const recordsPerPage = [6, 8, 10];
-  const [cardapios, setCardapios] = useState([]);
+  const recordsPerPage = [3, 5, 10];
+  const [pratos, setPratos] = useState([]);
   const [mostrarInativas, setMostrarInativas] = useState(false);
   const [search, setSearch] = useState('');
   const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
@@ -40,16 +49,15 @@ const CardapioLista = () => {
   };
 
   const findAll = () => {
-    CardapioService.findAll()
+    PratoService.findAll()
       .then((response) => {
-        const data = response.data || [];
-        setCardapios(data);
+        const data = (response.data || []).filter(item => item && item.id != null);
+        setPratos(data);
         setPage(0);
-        setPages(Math.ceil(data.length / rowsPerPage));
         setAlerta({ show: false, message: '', type: '' });
       })
       .catch(() => {
-        setCardapios([]);
+        setPratos([]);
         setAlerta({ show: true, message: 'Erro ao carregar cardápios.', type: 'error' });
       });
   };
@@ -62,20 +70,26 @@ const CardapioLista = () => {
       return;
     }
 
-    CardapioService.findByNome(trimmedNome)
+    PratoService.findByNome(trimmedNome)
       .then((response) => {
-        const data = Array.isArray(response.data) ? response.data : [response.data];
+        let data = [];
+        if (Array.isArray(response.data)) {
+          data = response.data.filter(item => item && item.id != null);
+        } else if (response.data && response.data.id != null) {
+          data = [response.data];
+        }
+
         if (data.length === 0) {
           setAlerta({ show: true, message: 'Nenhum cardápio encontrado!', type: 'warning' });
         } else {
-          setAlerta({ show: true, message: 'Usuário(s) encontrado(s) com sucesso.', type: 'success' });
+          setAlerta({ show: true, message: 'Cardápio(s) encontrado(s) com sucesso.', type: 'success' });
         }
-        setCardapios(data);
+
+        setPratos(data);
         setPage(0);
-        setPages(Math.ceil(data.length / rowsPerPage));
       })
       .catch(() => {
-        setCardapios([]);
+        setPratos([]);
         setAlerta({ show: true, message: 'Erro ao buscar cardápios.', type: 'error' });
       });
   };
@@ -85,15 +99,19 @@ const CardapioLista = () => {
   }, []);
 
   useEffect(() => {
-    const totalPages = Math.ceil(cardapios.length / rowsPerPage);
+    const filtrados = pratos
+      .filter(c => c && c.id != null)
+      .filter(c => mostrarInativas || c.statusPrato !== 'INATIVO');
+
+    const totalPages = Math.ceil(filtrados.length / rowsPerPage);
     setPages(totalPages);
     if (page > totalPages - 1) {
       setPage(0);
     }
-  }, [rowsPerPage, cardapios, page]);
+  }, [rowsPerPage, pratos, page, mostrarInativas]);
 
-  const lerCardapio = (id) => {
-    navigate(`/cardapioditar/${id}`);
+  const lerPrato = (id) => {
+    navigate(`/alterarprato/${id}`);
   };
 
   const listItems = () => {
@@ -101,7 +119,6 @@ const CardapioLista = () => {
     for (let i = 1; i <= pages; i++) {
       items.push(
         <li className="page-item" key={i}>
-          {/* Corrigido: converte valor para número */}
           <button
             className="page-link"
             type="button"
@@ -140,6 +157,65 @@ const CardapioLista = () => {
     );
   };
 
+  const renderCards = () => {
+    const filtrados = pratos
+      .filter(c => c && c.id != null)
+      .filter(c => mostrarInativas || c.statusPrato !== 'INATIVO');
+
+    const paginados = rowsPerPage > 0
+      ? filtrados.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      : filtrados;
+
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 2,
+          justifyContent: 'flex-start',
+          mt: 3,
+        }}
+      >
+        {paginados.map((prato, index) => {
+          const globalIndex = page * rowsPerPage + index + 1;
+          const dataFormatada = prato.diaServido
+            ? new Date(prato.diaServido).toLocaleDateString('pt-BR')
+            : '';
+
+          const imagemSrc = prato.foto?.startsWith('data:image')
+            ? prato.foto
+            : `data:image/jpeg;base64,${prato.foto}`;
+
+          return (
+            <Card key={prato.id ?? `fallback-${index}`} sx={{ width: 300 }}>
+
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="div">
+                  {globalIndex}. {prato.nome}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Prato ID: {prato.pratoId} <br />
+                  Dia Servido: {dataFormatada} <br />
+                  Status: {prato.statusPrato}
+                </Typography>
+              </CardContent>
+              <Box sx={{ p: 1, display: 'flex', justifyContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  size="small"
+                  onClick={() => lerPrato(prato.id)}
+                >
+                  Abrir
+                </Button>
+              </Box>
+            </Card>
+          );
+        })}
+      </Box>
+    );
+  };
+
   return (
     <div className="d-flex">
       <Sidebar />
@@ -147,7 +223,7 @@ const CardapioLista = () => {
         <Header goto={'/cardapio'} title={'Lista de cardápios'} logo={logo} />
 
         <section className="p-2 m-2 shadow-lg">
-          <form className=" m-2 row" onSubmit={onSearchSubmit}>
+          <form className="m-2 row" onSubmit={onSearchSubmit}>
             <label htmlFor="inputSearch" className="col-lg-3 col-form-label fs-9 ">
               Pesquise por nome:
             </label>
@@ -184,19 +260,22 @@ const CardapioLista = () => {
               variant="contained"
               sx={{ position: 'relative', color: 'white', backgroundColor: 'black' }}
             >
-              Total de Cardapios
+              Total de Cardápios
               <Badge
-                badgeContent={cardapios.length}
+                badgeContent={
+                  pratos.filter(
+                    c => mostrarInativas || c.statusPrato !== 'INATIVO'
+                  ).length
+                }
                 color="error"
-                sx={{ position: 'absolute', top: -1, right: -1, transform: 'translate(50%, -50%)' }}
+                sx={{
+                  position: 'absolute',
+                  top: -1,
+                  right: -1,
+                  transform: 'translate(50%, -50%)',
+                }}
               />
             </Button>
-
-            <Link to={'/usersearch'} style={{ textDecoration: 'none' }}>
-              <Button variant="contained" color={buttonColor} sx={{ ml: 2 }}>
-                Lista
-              </Button>
-            </Link>
 
             <Button
               variant="contained"
@@ -208,72 +287,32 @@ const CardapioLista = () => {
             </Button>
           </Box>
 
-          <div className="table-responsive">
-            <table className="table table-striped table-hover table-bordered shadow">
-              <thead className="table text-center">
-                <tr>
-                  <th>ID</th>
-                  <th>Nome</th>
-                  <th>Prato ID</th>
-                  <th>Dia Servido</th>
-                  <th>Status</th>
-                  <th>Abrir</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(rowsPerPage > 0
-                  ? cardapios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  : cardapios
-                )
-                  .filter((c) => mostrarInativas || c.statusCardapio !== 'INATIVO')
-                  .map((cardapio) => {
-                    const dataFormatada = cardapio.diaServido
-                      ? new Date(cardapio.diaServido).toLocaleDateString('pt-BR')
-                      : '';
-                    return (
-                      <tr key={cardapio.id}>
-                        <td className="text-center">{cardapio.id}</td>
-                        <td>{cardapio.nome}</td>
-                        <td>{cardapio.pratoId}</td>
-                        <td>{dataFormatada || cardapio.diaServido}</td>
-                        <td className="text-center">{cardapio.statusCardapio}</td>
-                        <td className="text-center">
-                          <Button
-                            variant="contained"
-                            color="warning"
-                            size="small"
-                            onClick={() => lerCardapio(cardapio.id)}
-                          >
-                            <i className="bi bi-person-fill-gear me-2"></i>Abrir
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-            <hr />
-            <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
-              <div className="fw-bold">Quantidade de Registros: {cardapios.length}</div>
-              <div className="d-flex align-items-center">
-                <label htmlFor="itensPorPagina" className="me-2 fw-bold">
-                  Registros por página:
-                </label>
-                <select
-                  id="itensPorPagina"
-                  className="form-select me-2"
-                  value={rowsPerPage}
-                  onChange={handleChangeRowsPerPage}
-                  style={{ width: '70px' }}
-                >
-                  {recordsPerPage.map((r) => (
-                    <option value={r} key={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-                <div>{listItems()}</div>
-              </div>
+          {renderCards()}
+
+          <hr />
+          <div className="d-flex justify-content-between align-items-center px-2 rounded-2">
+            <div className="fw-bold">
+              Quantidade de Registros:{' '}
+              {pratos.filter(c => mostrarInativas || c.statusPrato !== 'INATIVO').length}
+            </div>
+            <div className="d-flex align-items-center">
+              <label htmlFor="itensPorPagina" className="me-2 fw-bold">
+                Registros por página:
+              </label>
+              <select
+                id="itensPorPagina"
+                className="form-select me-2"
+                value={rowsPerPage}
+                onChange={handleChangeRowsPerPage}
+                style={{ width: '70px' }}
+              >
+                {recordsPerPage.map((r) => (
+                  <option value={r} key={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+              <div>{listItems()}</div>
             </div>
           </div>
         </section>
@@ -282,4 +321,5 @@ const CardapioLista = () => {
   );
 };
 
-export default CardapioLista;
+export default PratoLista;
+

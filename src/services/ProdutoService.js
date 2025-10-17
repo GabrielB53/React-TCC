@@ -17,9 +17,9 @@ const create = (data) => {
   const produtoDTO = {
     nome: data.nome,
     descricao: data.descricao,
-    porcao: data.porcao,
-    infoNutricional: data.infoNutricional,
-    categoriaId: parseInt(data.pratoId),
+    principal: data.principal,
+    secundario: data.secundario,
+    acompanhamento: data.acompanhamento,
     statusProduto: data.statusProduto
 
   };

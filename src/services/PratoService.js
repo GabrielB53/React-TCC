@@ -17,8 +17,10 @@ const create = (data) => {
     const pratoDTO = {
         nome: data.nome,
         descricao: data.descricao,
-        infoNutricional: data.infoNutricional,
-        statusPrato: data.statusPrato
+        principal: data.principal,
+        secundario: data.secundario,
+        acompanhamento: data.acompanhamento,
+        statusPrato: data.statusPrato,
     };
 
     formData.append("prato", new Blob([JSON.stringify(pratoDTO)], {

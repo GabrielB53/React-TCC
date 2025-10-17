@@ -14,6 +14,9 @@ const Cardapio = () => {
     const alterarCardapio = () => {
         navigate('/cardapiolista');
     };
+    const alterarPrato = () => {
+        navigate('/pratolista');
+    };
     const novaCategoria = () => {
         navigate('/addcategoria');
     };
@@ -41,30 +44,12 @@ const Cardapio = () => {
                         </ButtonGroup>
                     </div>
                 </section>
-                                <section className="caixota mt-2 mb-2">
-                    <div className="d-flex justify-content-between">
-                        <h3 className="pb-2">Categorias</h3>
-                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                            <Button onClick={novaCategoria}>Adicionar</Button>
-                            <Button onClick={alterarCardapio}>Lista</Button>
-                        </ButtonGroup>
-                    </div>
-                </section>
                 <section className="caixota mt-2 mb-2">
                     <div className="d-flex justify-content-between">
                         <h3 className="pb-2">Pratos</h3>
                         <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
                             <Button onClick={novoPrato}>Adicionar</Button>
-                            <Button onClick={alterarCardapio}>Lista</Button>
-                        </ButtonGroup>
-                    </div>
-                </section>
-                <section className="caixota mt-2 mb-2">
-                    <div className="d-flex justify-content-between">
-                        <h3 className="pb-2">Produtos</h3>
-                        <ButtonGroup variant="contained" color="secondary" aria-label="Basic button group">
-                            <Button onClick={novoProduto}>Adicionar</Button>
-                            <Button onClick={alterarCardapio}>Lista</Button>
+                            <Button onClick={alterarPrato}>Lista</Button>
                         </ButtonGroup>
                     </div>
                 </section>

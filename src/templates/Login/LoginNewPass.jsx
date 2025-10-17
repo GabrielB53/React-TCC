@@ -8,14 +8,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { useUser } from '../../contexts/UserContext'; // caso queira usar
-
 
 const LoginNewPass = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [usuario, setUsuario] = useState({ id: null, nome: "", email: "" });
+  const [usuario, setUsuario] = useState({ email: "" });
+  // só senha, nova senha e confirm
   const [formData, setFormData] = useState({ senha: "", newpass: "" });
   const [msgConfirm, setMsgConfirm] = useState("");
   const [message, setMessage] = useState("");
@@ -39,7 +38,7 @@ const LoginNewPass = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((data) => ({ ...data, [name]: value }));
+    setFormData(data => ({ ...data, [name]: value }));
 
     if (name === 'newpass' || name === 'senha') {
       setMsgConfirm(
@@ -57,18 +56,18 @@ const LoginNewPass = () => {
       return;
     }
 
-    UsuarioService.alterarSenha(id, { senha: formData.senha }).then(
-      (response) => {
-        setMessage(response.data.message);
+    // Envia { senha: "novaSenha" } como o controller espera
+    UsuarioService.alterarSenha(id, { senha: formData.senha })
+      .then(response => {
+        setMessage(response.data.message || "Senha alterada com sucesso!");
         setSuccessful(true);
-      },
-      (error) => {
+      })
+      .catch(error => {
         const respMessage =
-          (error.response?.data?.message) || error.message || error.toString();
+          error.response?.data?.message || error.message || error.toString();
         setMessage(respMessage);
         setSuccessful(false);
-      }
-    );
+      });
   };
 
   return (
@@ -109,7 +108,7 @@ const LoginNewPass = () => {
                 name="senha"
                 label="Nova Senha"
                 type="password"
-                value={formData.senha || ""}
+                value={formData.senha}
                 onChange={handleChange}
                 InputProps={{ style: { color: textColor } }}
                 InputLabelProps={{ style: { color: textColor } }}
@@ -123,7 +122,7 @@ const LoginNewPass = () => {
                 name="newpass"
                 label="Confirmar Senha"
                 type="password"
-                value={formData.newpass || ""}
+                value={formData.newpass}
                 onChange={handleChange}
                 InputProps={{ style: { color: textColor } }}
                 InputLabelProps={{ style: { color: textColor } }}
@@ -145,13 +144,13 @@ const LoginNewPass = () => {
                   color={buttonColor}
                   disabled={!formData.senha || !formData.newpass}
                 >
-                  Entrar
+                  Alterar Senha
                 </Button>
               </Box>
             </>
           )}
 
-          {message && (
+          {message && successful && (
             <Box sx={{ mt: 3 }}>
               <Typography
                 variant="body1"
@@ -160,7 +159,7 @@ const LoginNewPass = () => {
                   fontWeight: 'bold',
                   p: 2,
                   borderRadius: 2,
-                  bgcolor: successful ? 'success.main' : 'error.main',
+                  bgcolor: 'success.main',
                   color: 'white',
                 }}
               >
@@ -173,6 +172,24 @@ const LoginNewPass = () => {
                   </Button>
                 </Link>
               </Box>
+            </Box>
+          )}
+
+          {message && !successful && (
+            <Box sx={{ mt: 3 }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  textAlign: 'center',
+                  fontWeight: 'bold',
+                  p: 2,
+                  borderRadius: 2,
+                  bgcolor: 'error.main',
+                  color: 'white',
+                }}
+              >
+                {message}
+              </Typography>
             </Box>
           )}
         </form>

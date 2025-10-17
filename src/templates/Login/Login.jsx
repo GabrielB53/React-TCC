@@ -8,15 +8,15 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import UsuarioService from "../../services/UsuarioService";
-import { useUser } from '../../contexts/UserContext';  // importe o contexto do usuárion
+import { useUser } from '../../contexts/UserContext';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setCurrentUser } = useUser(); // pega a função para atualizar o contexto
+  const { setCurrentUser } = useUser();
 
   const [theme, setTheme] = useState('Claro');
   const [errorMessage, setErrorMessage] = useState('');
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', senha: '' });
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -38,19 +38,15 @@ const Login = () => {
     setErrorMessage('');
     setSubmitting(true);
 
-    UsuarioService.signin(formData.email, formData.password).then(
-      () => {
-        // Lê o usuário do localStorage (login antigo salva lá)
-        const userJson = localStorage.getItem("user");
-        const user = JSON.parse(userJson || null);
-
+    UsuarioService.signin(formData.email, formData.senha).then(
+      (user) => {
         if (!user) {
           setErrorMessage("Usuário ou senha inválidos");
           setSubmitting(false);
           return;
         }
 
-        setCurrentUser(user); // Atualiza o contexto com o usuário
+        setCurrentUser(user);
 
         if (user.statusUsuario === 'ATIVO') {
           navigate("/home");
@@ -112,11 +108,11 @@ const Login = () => {
             margin="normal"
             required
             fullWidth
-            id="password"
-            name="password"
+            id="senha"
+            name="senha"
             label="Senha"
             type="password"
-            value={formData.password}
+            value={formData.senha}
             onChange={handleChange}
             InputProps={{ style: { color: textColor } }}
             InputLabelProps={{ style: { color: textColor } }}

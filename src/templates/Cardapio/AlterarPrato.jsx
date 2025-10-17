@@ -16,7 +16,11 @@ const AlterarPrato = () => {
     const [prato, setPrato] = useState({
         id: null,
         nome: "",
-        diaServido: "",
+        descricao: "",
+        principal: "",
+        secundario: "",
+        acompanhamento: "",
+        statusPrato: "",
     });
 
     const [alerta, setAlerta] = useState({ show: false, message: '', type: '' });
@@ -27,7 +31,7 @@ const AlterarPrato = () => {
                 setPrato(response.data);
             })
             .catch(() => {
-                setAlerta({ show: true, message: 'Erro ao buscar cardápio.', type: 'error' });
+                setAlerta({ show: true, message: 'Erro ao buscar prato.', type: 'error' });
             });
     }, [id]);
 
@@ -40,11 +44,11 @@ const AlterarPrato = () => {
         e.preventDefault();
         PratoService.update(id, prato)
             .then(() => {
-                setAlerta({ show: true, message: 'cardápio atualizado com sucesso!', type: 'success' });
+                setAlerta({ show: true, message: 'prato atualizado com sucesso!', type: 'success' });
                 setTimeout(() => navigate('/pratolista'), 1000);
             })
             .catch(() => {
-                setAlerta({ show: true, message: 'Erro ao atualizar cardápio.', type: 'error' });
+                setAlerta({ show: true, message: 'Erro ao atualizar prato.', type: 'error' });
             });
     };
 
@@ -55,32 +59,32 @@ const AlterarPrato = () => {
                 setTimeout(() => navigate('/pratolista'), 1000);
             })
             .catch(() => {
-                setAlerta({ show: true, message: 'Erro ao inativar cardápio.', type: 'error' });
+                setAlerta({ show: true, message: 'Erro ao inativar prato.', type: 'error' });
             });
     };
 
     const reativar = () => {
         PratoService.reativar(id)
             .then(() => {
-                setAlerta({ show: true, message: 'Prato reativado com sucesso!', type: 'success' });
-                setTimeout(() => navigate('/pratolista'), 2000);
+                setAlerta({ show: true, message: 'Cardápio reativado com sucesso!', type: 'success' });
+                setTimeout(() => navigate('/pratoslista'), 2000);
             })
             .catch(() => {
-                setAlerta({ show: true, message: 'Erro ao reativar cardápio.', type: 'error' });
+                setAlerta({ show: true, message: 'Erro ao reativar prato.', type: 'error' });
             });
     };
 
     const textColor = theme === 'Claro' ? '' : 'white';
     const background = theme === 'Claro' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.733)';
-    const paperBackground = theme === 'Claro' ? 'rgba(255, 255, 255)' : 'rgba(0, 0, 0, 0.0)'
+    const paperBackground = theme === 'Claro' ? 'rgba(255, 255, 255)' : 'rgba(0, 0, 0, 0.0)';
 
     return (
         <div className="d-flex">
             <Sidebar />
             <div className="p-3 w-100">
                 <Header
-                    goto={'/prato'}
-                    title={'Editar Prato'}
+                    goto={'/cardapio'}
+                    title={'Editar Cardápio'}
                     logo={logo}
                 />
 
@@ -109,15 +113,18 @@ const AlterarPrato = () => {
                                         label="ID"
                                         value={prato.id || ''}
                                         fullWidth
-                                        InputProps={{ readOnly: true, style: { color: textColor } }}
+                                        InputProps={{
+                                            readOnly: true,
+                                            style: { color: textColor, backgroundColor: background }
+                                        }}
                                         InputLabelProps={{ style: { color: textColor } }}
                                         sx={{
                                             backgroundColor: background,
                                             borderRadius: 1,
                                             '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
                                             }
                                         }}
                                     />
@@ -136,9 +143,9 @@ const AlterarPrato = () => {
                                             backgroundColor: background,
                                             borderRadius: 1,
                                             '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
                                             }
                                         }}
                                     />
@@ -146,10 +153,9 @@ const AlterarPrato = () => {
 
                                 <Grid item xs={12} sm={5}>
                                     <TextField
-                                        label="Dia"
-                                        name="diaServido"
-                                        type="text"
-                                        value={prato.diaServido}
+                                        label="Descrição"
+                                        name="descricao"
+                                        value={prato.descricao}
                                         onChange={handleChange}
                                         fullWidth
                                         InputProps={{ style: { color: textColor } }}
@@ -158,9 +164,72 @@ const AlterarPrato = () => {
                                             backgroundColor: background,
                                             borderRadius: 1,
                                             '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    <TextField
+                                        label="Principal"
+                                        name="principal"
+                                        value={prato.principal}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                
+                                <Grid item xs={12} sm={5}>
+                                    <TextField
+                                        label="Secundário"
+                                        name="secundario"
+                                        value={prato.secundario}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12} sm={5}>
+                                    <TextField
+                                        label="Acompanhamento"
+                                        name="acompanhamento"
+                                        value={prato.acompanhamento}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        InputProps={{ style: { color: textColor } }}
+                                        InputLabelProps={{ style: { color: textColor } }}
+                                        sx={{
+                                            backgroundColor: background,
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-root': {
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
                                             }
                                         }}
                                     />
@@ -171,38 +240,21 @@ const AlterarPrato = () => {
                                         label="Status"
                                         value={prato.statusPrato || ''}
                                         fullWidth
-                                        InputProps={{ readOnly: true, style: { color: textColor } }}
+                                        InputProps={{
+                                            readOnly: true,
+                                            style: { color: textColor, backgroundColor: background }
+                                        }}
                                         InputLabelProps={{ style: { color: textColor } }}
                                         sx={{
                                             backgroundColor: background,
                                             borderRadius: 1,
                                             '& .MuiOutlinedInput-root': {
-                                                '& fieldset': { borderColor: textColor },
-                                                '&:hover fieldset': { borderColor: textColor },
-                                                '&.Mui-focused fieldset': { borderColor: textColor },
+                                                '& fieldset': { borderColor: textColor || 'black' },
+                                                '&:hover fieldset': { borderColor: textColor || 'black' },
+                                                '&.Mui-focused fieldset': { borderColor: textColor || 'black' },
                                             }
                                         }}
                                     />
-                                </Grid>
-
-                                <Grid item xs={12} sm={5}>
-                                    {/* Aqui seria o id do prato, que também n sei como fazer kk*/}
-                                </Grid>
-
-                                <Grid item xs={12} sm={5}>
-                                    {prato.foto && (
-                                        <img
-                                            src={prato.foto}
-                                            alt="Imagem do Prato"
-                                            style={{
-                                                width: '100%',
-                                                maxHeight: '250px',
-                                                objectFit: 'cover',
-                                                borderRadius: '8px',
-                                                border: `1px solid ${textColor}`
-                                            }}
-                                        />
-                                    )}
                                 </Grid>
 
                                 <Grid item xs={12} display="flex" justifyContent="space-between">
