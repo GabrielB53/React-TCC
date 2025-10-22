@@ -194,8 +194,10 @@ const PratoLista = () => {
                   {globalIndex}. {prato.nome}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Prato ID: {prato.pratoId} <br />
-                  Dia Servido: {dataFormatada} <br />
+                  Descrição: {prato.descricao} <br />
+                  Principal: {prato.principal} <br />
+                  Secundario: {prato.secundario} <br />
+                  Acompanhamento: {prato.acompanhamento} <br />
                   Status: {prato.statusPrato}
                 </Typography>
               </CardContent>
